@@ -1,0 +1,141 @@
+<script>
+    import supabase from '../supabase'
+    import { user } from '../store'
+    import { onMount } from 'svelte'
+    import { getVideoData } from '../utils'
+    export let params = {}
+    let clashData = {}
+    let errorText = ''
+    let loading = true
+    let loadingbtn = false
+    let formData = {
+        name: '',
+        link: ''
+    }
+    let submitted = false
+    let videoData = null
+    let disableSubmit = true
+    onMount(() => {
+        supabase
+            .from('Clash')
+            .select('*')
+            .eq('id', params.id)
+            .single()
+            .then(({ error, data }) => {
+                if (error) {
+                    errorText = 'Clash does not exist!'
+                } else {
+                    clashData = data
+                }
+                loading = false
+            })
+    })
+    async function submitVideo() {
+        loadingbtn = true
+        let { error, data } = await supabase
+            .from('ClashVideo')
+            .insert({ ...formData, clash_id: clashData.id })
+        if (error) {
+            errorText = error.message
+        } else {
+            submitted = true
+        }
+        loadingbtn = false
+    }
+    async function inputLink(event) {
+        let link = event.target.value
+        let params = new URLSearchParams(new URL(link).search)
+        if (params.get('v')) {
+            videoData = await getVideoData(params.get('v'))
+            if (videoData) {
+                disableSubmit = false
+            } else {
+                disableSubmit = true
+            }
+        }
+    }
+</script>
+
+{#if loading}
+    <div class="progress">
+        <div
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style="width: 100%;"
+        />
+    </div>
+{:else if errorText}
+    <div class="alert alert-dismissible alert-danger">
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            on:click={() => (errorText = '')}
+        />
+        {errorText}
+    </div>
+{:else}
+    <h1>{clashData.topic}</h1>
+    {#if !submitted}
+        <div class="card border-primary mb-3 mt-5 w-50">
+            <div class="card-body">
+                <form>
+                    <label for="name" class="col-form-label"
+                        >Share your name:</label
+                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="name"
+                        placeholder="Nickname..."
+                        bind:value={formData.name}
+                    />
+
+                    <label for="link" class="col-form-label"
+                        >Share a Youtube-Link:
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="link"
+                        placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                        bind:value={formData.link}
+                        on:input={inputLink}
+                    />
+                    {#if videoData}
+                        <img
+                            class="my-4"
+                            src={videoData.snippet.thumbnails.medium.url}
+                            style="max-width: 300px;"
+                            alt="Thumbnail"
+                        />
+                        <div
+                            class=" d-flex justify-content-center align-items-center"
+                        >
+                            <p>{videoData.snippet.title}</p>
+                        </div>
+                    {/if}
+                    <button
+                        class="btn btn-secondary mt-4 "
+                        type="submit"
+                        disabled={disableSubmit || !formData.name}
+                        on:click|preventDefault={submitVideo}
+                    >
+                        {#if loadingbtn}
+                            <span
+                                class="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                        {/if}
+                        Submit Video!
+                    </button>
+                </form>
+            </div>
+        </div>
+    {:else}
+        <div class="alert alert-dismissible alert-success mt-5">
+            Your Video is submitted! You can close this window now.
+        </div>
+    {/if}
+{/if}
