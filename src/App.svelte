@@ -6,6 +6,8 @@
     async function signInWithTwitch() {
         const { user, session, error } = await supabase.auth.signIn({
             provider: 'twitch'
+        },{
+            scopes: 'chat:read chat:edit'
         })
     }
     async function signout() {
@@ -13,7 +15,7 @@
     }
     supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
-            $user = session.user
+            $user = {...session.user, access_token: session.provider_token}
         } else {
             $user = null
         }

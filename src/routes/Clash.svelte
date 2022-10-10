@@ -3,12 +3,28 @@
     import { user } from '../store'
     import { getVideoData } from '../utils'
     import { onMount } from 'svelte'
+    import { Client } from 'tmi.js'
     export let params = {}
     let clashData = {}
     let errorText = ''
     let loading = true
     let copyInput = {}
     let submissions = []
+    let twitchClient = {}
+    if($user){
+
+        twitchClient = Client({
+            options: { debug: true },
+            identity: {
+                username: $user.user_metadata.name,
+                password: `oauth:${$user.access_token}`
+            },
+            channels: [ $user.user_metadata.name ]
+        })
+        twitchClient.connect()
+    }else{
+        errorText = 'You need to log in to see this page!'
+    }
     onMount(() => {
         supabase
             .from('Clash')
@@ -59,6 +75,11 @@
             errorText = error.message
         }
     }
+    function startGame(){
+        if(twitchClient._isConnected()){
+            twitchClient._sendMessage(0,$user.user_metadata.name,'----START VOTING----')
+        }
+    }
 </script>
 
 {#if loading}
@@ -86,6 +107,13 @@
         class="btn btn-outline-secondary mt-3 btn-lg"
         on:click={copyLink}>Copy Link!</button
     >
+
+    <button   
+    type="button"
+    class="btn mt-3 btn-lg btn-secondary"
+    on:click="{startGame}">
+        Start
+    </button>
     <input
         type="text"
         class="not-shown"
