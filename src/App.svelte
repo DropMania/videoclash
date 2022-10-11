@@ -4,18 +4,21 @@
     import supabase from './supabase'
     import { user } from './store'
     async function signInWithTwitch() {
-        const { user, session, error } = await supabase.auth.signIn({
-            provider: 'twitch'
-        },{
-            scopes: 'chat:read chat:edit'
-        })
+        const { user, session, error } = await supabase.auth.signIn(
+            {
+                provider: 'twitch'
+            },
+            {
+                scopes: 'chat:read chat:edit'
+            }
+        )
     }
     async function signout() {
         const { error } = await supabase.auth.signOut()
     }
     supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
-            $user = {...session.user, access_token: session.provider_token}
+            $user = { ...session.user, access_token: session.provider_token }
         } else {
             $user = null
         }
@@ -48,6 +51,8 @@
         {/if}
     </div>
 </nav>
-<div class="container text-center mt-5 d-flex flex-column align-items-center">
+<div
+    class="container text-center mt-5 d-flex flex-column align-items-center h-100"
+>
     <Router {routes} />
 </div>

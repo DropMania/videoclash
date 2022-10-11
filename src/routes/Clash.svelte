@@ -11,18 +11,17 @@
     let copyInput = {}
     let submissions = []
     let twitchClient = {}
-    if($user){
-
+    if ($user) {
         twitchClient = Client({
             options: { debug: true },
             identity: {
                 username: $user.user_metadata.name,
                 password: `oauth:${$user.access_token}`
             },
-            channels: [ $user.user_metadata.name ]
+            channels: [$user.user_metadata.name]
         })
         twitchClient.connect()
-    }else{
+    } else {
         errorText = 'You need to log in to see this page!'
     }
     onMount(() => {
@@ -39,8 +38,27 @@
                     loadSubmissions()
                     supabase
                         .from('ClashVideo')
-                        .on('*', (payload) => {
-                            loadSubmissions()
+                        .on('*', async (payload) => {
+                            //loadSubmissions()
+                            if (payload.eventType === 'INSERT') {
+                                let params = new URLSearchParams(
+                                    new URL(payload.new.link).search
+                                )
+                                let videoData = await getVideoData(
+                                    params.get('v')
+                                )
+                                submissions = submissions.concat({
+                                    ...payload.new,
+                                    videoData,
+                                    youtubeId: params.get('v')
+                                })
+                            }
+                            if (payload.eventType === 'DELETE') {
+                                submissions = submissions.filter(
+                                    (submission) =>
+                                        submission.id !== payload.old.id
+                                )
+                            }
                         })
                         .subscribe()
                 }
@@ -57,13 +75,17 @@
             .select('*')
             .eq('clash_id', clashData.id)
 
-        submissions = data.map((d) => {
-            let params = new URLSearchParams(new URL(d.link).search)
-            return {
-                ...d,
-                youtubeId: params.get('v')
-            }
-        })
+        submissions = await Promise.all(
+            data.map(async (d) => {
+                let params = new URLSearchParams(new URL(d.link).search)
+                let videoData = await getVideoData(params.get('v'))
+                return {
+                    ...d,
+                    videoData,
+                    youtubeId: params.get('v')
+                }
+            })
+        )
     }
     async function deleteSubmission(videoData) {
         let { error, data } = await supabase
@@ -75,9 +97,13 @@
             errorText = error.message
         }
     }
-    function startGame(){
-        if(twitchClient._isConnected()){
-            twitchClient._sendMessage(0,$user.user_metadata.name,'----START VOTING----')
+    function startGame() {
+        if (twitchClient._isConnected()) {
+            twitchClient._sendMessage(
+                0,
+                $user.user_metadata.name,
+                '-----------START VOTING-----------'
+            )
         }
     }
 </script>
@@ -108,11 +134,13 @@
         on:click={copyLink}>Copy Link!</button
     >
 
-    <button   
-    type="button"
-    class="btn mt-3 btn-lg btn-secondary"
-    on:click="{startGame}">
-        Start
+    <button
+        type="button"
+        class="btn mt-5 btn-lg btn-secondary fs-2"
+        disabled={submissions.length !== clashData.video_count}
+        on:click={startGame}
+    >
+        Start ({submissions.length}/{clashData.video_count})
     </button>
     <input
         type="text"
@@ -120,17 +148,16 @@
         bind:this={copyInput}
         value={`${location.origin}/#/submit/${clashData.id}`}
     />
-    <div class="card border-primary mb-3 mt-5" style="">
-        <div class="card-body">
+    <div class="card border-primary mb-3 mt-5 overflow-auto">
+        <div class="card-body h-100">
             <h4 class="card-title">
                 Submissions ({submissions.length}/{clashData.video_count})
             </h4>
             <p class="card-text">below you can see all the submissions</p>
-            <table class="table table-hover">
+            <table class="table table-hover h-100 mt-3">
                 <thead>
                     <tr>
                         <th scope="col" />
-
                         <th scope="col" />
                         <th scope="col">Title</th>
                         <th scope="col">Submitted By</th>
@@ -140,42 +167,33 @@
                 <tbody>
                     {#each submissions as submission, i}
                         <tr>
-                            {#await getVideoData(submission.youtubeId)}
-                                <div class="progress">
-                                    <div
-                                        class="progress-bar progress-bar-striped progress-bar-animated"
-                                        role="progressbar"
-                                        style="width: 100%;"
+                            <td>{i + 1}</td>
+                            <td>
+                                <a
+                                    href="https://www.youtube.com/watch?v={submission
+                                        .videoData.id}"
+                                    target="_blank"
+                                >
+                                    <img
+                                        src={submission.videoData.snippet
+                                            .thumbnails.default.url}
+                                        alt={submission.videoData.snippet.title}
                                     />
-                                </div>
-                            {:then videoDescription}
-                                <td>{i + 1}</td>
-                                <td>
-                                    <a
-                                        href="https://www.youtube.com/watch?v={videoDescription.id}"
-                                        target="_blank"
-                                    >
-                                        <img
-                                            src={videoDescription.snippet
-                                                .thumbnails.default.url}
-                                            alt={videoDescription.snippet.title}
-                                        />
-                                    </a>
-                                </td>
-                                <td>{videoDescription.snippet.title}</td>
-                                <td>
-                                    {submission.name}
-                                </td>
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="btn btn-danger"
-                                        on:click={() =>
-                                            deleteSubmission(submission)}
-                                        >Remove</button
-                                    >
-                                </td>
-                            {/await}
+                                </a>
+                            </td>
+                            <td>{submission.videoData.snippet.title}</td>
+                            <td>
+                                {submission.name}
+                            </td>
+                            <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-danger"
+                                    on:click={() =>
+                                        deleteSubmission(submission)}
+                                    >Remove</button
+                                >
+                            </td>
                         </tr>
                     {/each}
                 </tbody>
