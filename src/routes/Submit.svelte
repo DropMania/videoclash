@@ -3,9 +3,11 @@
     import { user } from '../store'
     import { onMount } from 'svelte'
     import { getVideoData } from '../utils'
+    import moment from 'moment'
     export let params = {}
     let clashData = {}
     let errorText = ''
+    let invalidVideo = ''
     let loading = true
     let loadingbtn = false
     let formData = {
@@ -43,15 +45,29 @@
         loadingbtn = false
     }
     async function inputLink(event) {
+        disableSubmit = true
         let link = event.target.value
-        let params = new URLSearchParams(new URL(link).search)
-        if (params.get('v')) {
-            videoData = await getVideoData(params.get('v'))
-            if (videoData) {
-                disableSubmit = false
-            } else {
-                disableSubmit = true
+        try{
+            let params = new URLSearchParams(new URL(link).search)
+            if (params.get('v')) {
+                videoData = await getVideoData(params.get('v'))
+                if (videoData) {
+                    let duration = videoData.contentDetails.duration
+                    let minutes = moment.duration(duration).asMinutes()
+                    if(minutes <= clashData.max_video_length){
+                        disableSubmit = false
+                        invalidVideo = ''
+                    }else{
+                        invalidVideo = 'the Video is too long!'
+                    }
+                } else {
+                    invalidVideo = 'the Video doesnt exist!'
+                }
+            }else{
+                invalidVideo = 'You need to paste a Youtube-Video link!'
             }
+        }catch(e){
+            invalidVideo = 'You need to paste a Youtube-Video link!'
         }
     }
 </script>
@@ -90,18 +106,22 @@
                         placeholder="Nickname..."
                         bind:value={formData.name}
                     />
-
-                    <label for="link" class="col-form-label"
-                        >Share a Youtube-Link:
-                    </label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="link"
-                        placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                        bind:value={formData.link}
-                        on:input={inputLink}
-                    />
+                    <div class="form-group">
+                        <label for="link" class="col-form-label"
+                            >Share a Youtube-Link (max {clashData.max_video_length}min.):
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control {invalidVideo ? 'is-invalid' : ''}"
+                            id="link"
+                            placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                            bind:value={formData.link}
+                            on:input={inputLink}
+                        />
+                        {#if invalidVideo}
+                            <div class="invalid-feedback">{invalidVideo}</div>
+                        {/if}
+                    </div>
                     {#if videoData}
                         <img
                             class="my-4"
