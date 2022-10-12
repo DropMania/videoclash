@@ -15,6 +15,10 @@
     let submitted = false
     let videoData = null
     let disableSubmit = true
+    let submittedCount = 0
+    $: submittedCount >= clashData.video_count && !submitted
+        ? (errorText = 'Clash is full!')
+        : (errorText = '')
     onMount(() => {
         supabase
             .from('Clash')
@@ -29,7 +33,26 @@
                 }
                 loading = false
             })
+
+        loadSubmissionCount()
+        supabase
+            .from('ClashVideo')
+            .on('*', (payload) => {
+                loadSubmissionCount()
+            })
+            .subscribe()
     })
+    function loadSubmissionCount() {
+        supabase
+            .from('ClashVideo')
+            .select('*', { count: 'exact' })
+            .eq('clash_id', params.id)
+            .then(({ data, error }) => {
+                if (!error) {
+                    submittedCount = data.length
+                }
+            })
+    }
     async function submitVideo() {
         loadingbtn = true
         let { error, data } = await supabase
@@ -66,16 +89,10 @@
     </div>
 {:else if errorText}
     <div class="alert alert-dismissible alert-danger">
-        <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            on:click={() => (errorText = '')}
-        />
         {errorText}
     </div>
 {:else}
-    <h1>{clashData.topic}</h1>
+    <h1>{clashData.topic} ({submittedCount}/{clashData.video_count})</h1>
     {#if !submitted}
         <div class="card border-primary mb-3 mt-5 w-50">
             <div class="card-body">
