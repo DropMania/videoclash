@@ -5,13 +5,16 @@
 import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
 
 console.log("Hello from Functions!")
-
+interface reqBody {
+  name: string
+}
 serve(async (req) => {
-  const { name } = await req.json()
+  const body:reqBody = await req.json()
   const data = {
-    message: `Hello ${name}! ${Deno.env.get("MY_NAME")}`,
+    message: `Hello ${body.name}! ${Deno.env.get("MY_NAME")}`,
   }
 
+  
   return new Response(
     JSON.stringify(data),
     { headers: { "Content-Type": "application/json" } },

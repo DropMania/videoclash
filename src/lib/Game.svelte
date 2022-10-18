@@ -3,6 +3,12 @@
     import { Client } from 'tmi.js'
     import { user } from '../store'
     export let gameState = {}
+    let finaleNumber = gameState.submissions.length
+    const finaleNames = {
+        8: 'Quarter Finals',
+        4: 'Semi Finals',
+        2: 'Finals'
+    }
     const battleStateEnums = {
         PICKED: 1,
         VOTING: 2,
@@ -48,6 +54,7 @@
                 console.log('finish', gameState.winners)
             } else {
                 gameState.submissions = gameState.winners
+                finaleNumber = gameState.submissions.length
                 gameState.winners = []
                 pickVideos()
             }
@@ -89,6 +96,7 @@
 </script>
 
 {#if gameState.battleState && gameState.battleState != battleStateEnums.FINSISH}
+    {finaleNames[finaleNumber] ? finaleNames[finaleNumber] : `round of ${finaleNumber}`}
     <div class="d-flex justify-content-between align-items-center w-100">
         <div>
             <h1>Video 1</h1>
