@@ -22,6 +22,9 @@
         ? (errorText = 'Clash is full!')
         : (errorText = '')
     onMount(() => {
+        if(sessionStorage.getItem(`submitted-${params.id}`)){
+            submitted = true
+        }
         supabase
             .from('Clash')
             .select('*')
@@ -64,6 +67,7 @@
             errorText = error.message
         } else {
             submitted = true
+            sessionStorage.setItem(`submitted-${params.id}`, '1')
         }
         loadingbtn = false
     }
