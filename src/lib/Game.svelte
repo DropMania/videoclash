@@ -4,6 +4,8 @@
     import { user } from '../store'
     export let gameState = {}
     let finaleNumber = gameState.submissions.length
+    let roundNumber = 0
+    let rounds = gameState.submissions.length / 2
     const finaleNames = {
         8: 'Quarter Finals',
         4: 'Semi Finals',
@@ -48,6 +50,7 @@
             gameState.battleState = battleStateEnums.PICKED
             gameState.vote1 = 0
             gameState.vote2 = 0
+            roundNumber++
         } else {
             if (gameState.winners.length === 1) {
                 gameState.battleState = battleStateEnums.FINSISH
@@ -56,6 +59,8 @@
                 gameState.submissions = gameState.winners
                 finaleNumber = gameState.submissions.length
                 gameState.winners = []
+                roundNumber = 0
+                rounds = gameState.submissions.length / 2
                 pickVideos()
             }
         }
@@ -96,7 +101,7 @@
 </script>
 
 {#if gameState.battleState && gameState.battleState != battleStateEnums.FINSISH}
-    {finaleNames[finaleNumber] ? finaleNames[finaleNumber] : `round of ${finaleNumber}`}
+    {finaleNames[finaleNumber] ? finaleNames[finaleNumber] : `round of ${finaleNumber}`} ({roundNumber}/{rounds})
     <div class="d-flex justify-content-between align-items-center w-100">
         <div>
             <h1>Video 1</h1>
