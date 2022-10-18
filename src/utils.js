@@ -1,6 +1,6 @@
 export function shortid(len = 11) {
-    var result = ''
-    var chars =
+    let result = ''
+    let chars =
         '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_'
     for (var i = len; i > 0; --i) {
         result += chars[Math.floor(Math.random() * chars.length)]

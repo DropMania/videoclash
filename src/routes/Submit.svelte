@@ -70,26 +70,26 @@
     async function inputLink(event) {
         disableSubmit = true
         let link = event.target.value
-        try{
+        try {
             let params = new URLSearchParams(new URL(link).search)
             if (params.get('v')) {
                 videoData = await getVideoData(params.get('v'))
                 if (videoData) {
                     let duration = videoData.contentDetails.duration
                     let minutes = moment.duration(duration).asMinutes()
-                    if(minutes <= clashData.max_video_length){
+                    if (minutes <= clashData.max_video_length) {
                         disableSubmit = false
                         invalidVideo = ''
-                    }else{
+                    } else {
                         invalidVideo = 'the Video is too long!'
                     }
                 } else {
                     invalidVideo = 'the Video doesnt exist!'
                 }
-            }else{
+            } else {
                 invalidVideo = 'You need to paste a Youtube-Video link!'
             }
-        }catch(e){
+        } catch (e) {
             invalidVideo = 'You need to paste a Youtube-Video link!'
         }
     }
@@ -129,7 +129,9 @@
                         </label>
                         <input
                             type="text"
-                            class="form-control {invalidVideo ? 'is-invalid' : ''}"
+                            class="form-control {invalidVideo
+                                ? 'is-invalid'
+                                : ''}"
                             id="link"
                             placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
                             bind:value={formData.link}
