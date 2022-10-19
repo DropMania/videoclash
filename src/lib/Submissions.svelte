@@ -1,21 +1,47 @@
 <script>
     import { createEventDispatcher } from 'svelte'
+    import { callBot } from '../utils'
+    import { user } from '../store'
     export let submissions
     export let clashData
     let copyInput = {}
     const dispatch = createEventDispatcher()
+    let sending = false
 
     function copyLink() {
         copyInput.select()
         document.execCommand('copy')
     }
+    async function sendLink() {
+        sending = true
+        await callBot('send_link', {
+            channel: $user.user_metadata.name,
+            id: clashData.id
+        })
+        sending = false
+    }
 </script>
 
-<button
-    type="button"
-    class="btn btn-outline-secondary mt-3 btn-lg"
-    on:click={copyLink}>Copy Link!</button
->
+<div class="d-flex gap-5">
+    <button
+        type="button"
+        class="btn btn-outline-secondary mt-3 btn-lg"
+        on:click={copyLink}>Copy Link!</button
+    >
+    <button
+        type="button"
+        class="btn btn-outline-secondary mt-3 btn-lg"
+        on:click={sendLink}
+        >Send Link to Chat!
+        {#if sending}
+            <span
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+            />
+        {/if}
+    </button>
+</div>
 
 <button
     type="button"

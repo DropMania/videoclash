@@ -22,7 +22,7 @@
         ? (errorText = 'Clash is full!')
         : (errorText = '')
     onMount(() => {
-        if(sessionStorage.getItem(`submitted-${params.id}`)){
+        if (sessionStorage.getItem(`submitted-${params.id}`)) {
             submitted = true
         }
         supabase
@@ -114,7 +114,7 @@
 {:else}
     <h1>{clashData.topic} ({submittedCount}/{clashData.video_count})</h1>
     {#if !submitted}
-        <div class="card border-primary mb-3 mt-5 w-50">
+        <div class="card border-primary mb-3 mt-5 w-100">
             <div class="card-body">
                 <form>
                     <label for="name" class="col-form-label"

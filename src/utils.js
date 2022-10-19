@@ -17,3 +17,17 @@ export async function getVideoData(id) {
     let data = await res.json()
     return data.items[0]
 }
+
+export async function callBot(endpoint, params) {
+    let URL = 'https://videoclash-bot.vercel.app'
+    if (location.origin.startsWith('http://')) {
+        URL = 'http://localhost:3000'
+    }
+    let res = await fetch(`${URL}/${endpoint}`, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify(params)
+    })
+    let data = await res.json()
+    return data
+}
