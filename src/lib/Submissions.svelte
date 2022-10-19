@@ -14,10 +14,14 @@
     }
     async function sendLink() {
         sending = true
-        await callBot('send_link', {
-            channel: $user.user_metadata.name,
-            id: clashData.id
-        })
+        try {
+            await callBot('send_link', {
+                channel: $user.user_metadata.name,
+                id: clashData.id
+            })
+        } catch (e) {
+            console.log(e)
+        }
         sending = false
     }
 </script>
