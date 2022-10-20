@@ -44,16 +44,20 @@
                         .from('ClashVideo')
                         .on('*', async (payload) => {
                             if (payload.eventType === 'INSERT') {
-                                let params = new URLSearchParams(
-                                    new URL(payload.new.link).search
-                                )
-                                let videoData = await getVideoData(
-                                    params.get('v')
-                                )
+                                let id = ''
+                                if (payload.new.link.includes('youtu.be')) {
+                                    id = payload.new.link.split('youtu.be/')[1]
+                                } else {
+                                    let params = new URLSearchParams(
+                                        new URL(payload.new.link).search
+                                    )
+                                    id = params.get('v')
+                                }
+                                let videoData = await getVideoData(id)
                                 submissions = submissions.concat({
                                     ...payload.new,
                                     videoData,
-                                    youtubeId: params.get('v')
+                                    youtubeId: id
                                 })
                             }
                             if (payload.eventType === 'DELETE') {
@@ -76,12 +80,18 @@
 
         submissions = await Promise.all(
             data.map(async (d) => {
-                let params = new URLSearchParams(new URL(d.link).search)
-                let videoData = await getVideoData(params.get('v'))
+                let id = ''
+                if (d.link.includes('youtu.be')) {
+                    id = d.link.split('youtu.be/')[1]
+                } else {
+                    let params = new URLSearchParams(new URL(d.link).search)
+                    id = params.get('v')
+                }
+                let videoData = await getVideoData(id)
                 return {
                     ...d,
                     videoData,
-                    youtubeId: params.get('v')
+                    youtubeId: id
                 }
             })
         )
