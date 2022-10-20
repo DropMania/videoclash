@@ -1,6 +1,7 @@
 
 body{
-  height: 100vh;
+  height: inherit;
+  min-height: 100vh;
 }
 #app{
   height: 100%;

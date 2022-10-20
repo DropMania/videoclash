@@ -51,8 +51,6 @@
         {/if}
     </div>
 </nav>
-<div
-    class="container text-center mt-5 d-flex flex-column align-items-center h-100"
->
+<div class="container text-center mt-5 d-flex flex-column align-items-center">
     <Router {routes} />
 </div>

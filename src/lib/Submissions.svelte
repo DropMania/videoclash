@@ -61,7 +61,10 @@
     bind:this={copyInput}
     value={`${location.origin}/#/submit/${clashData.id}`}
 />
-<div class="card border-primary mb-3 mt-5 overflow-auto">
+<div
+    class="card border-primary mb-3 mt-5 overflow-auto"
+    style="height: 60vmin;"
+>
     <div class="card-body h-100">
         <h4 class="card-title">
             Submissions ({submissions.length}/{clashData.video_count})

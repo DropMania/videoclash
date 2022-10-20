@@ -2,6 +2,7 @@
     import { onMount } from 'svelte'
     import { Client } from 'tmi.js'
     import { user } from '../store'
+    import { callBot } from '../utils'
     export let gameState = {}
     let finaleNumber = gameState.submissions.length
     let roundNumber = 0
@@ -43,6 +44,8 @@
         pickVideos()
     })
     function pickVideos() {
+        votingTime = maxVotingTime
+        stopTimer()
         if (gameState.submissions.length) {
             gameState.video1 = gameState.submissions[0]
             gameState.video2 = gameState.submissions[1]
@@ -66,8 +69,10 @@
         }
     }
     function startVoting() {
+        votingTime = maxVotingTime
         gameState.battleState = battleStateEnums.VOTING
         voted = []
+        callBot('start_vote', { channel: $user.user_metadata.name })
         startTimer()
     }
     function resetVoting() {
@@ -75,6 +80,7 @@
         gameState.vote1 = 0
         gameState.vote2 = 0
         votingTime = maxVotingTime
+        stopTimer()
     }
     function pick(video) {
         if (video === 1) {
@@ -91,6 +97,7 @@
                 votingTime--
                 if (votingTime === 0) {
                     gameState.battleState = battleStateEnums.ENDED
+                    callBot('end_vote', { channel: $user.user_metadata.name })
                 }
             }
         }, 1000)
@@ -101,7 +108,9 @@
 </script>
 
 {#if gameState.battleState && gameState.battleState != battleStateEnums.FINSISH}
-    {finaleNames[finaleNumber] ? finaleNames[finaleNumber] : `round of ${finaleNumber}`} ({roundNumber}/{rounds})
+    {finaleNames[finaleNumber]
+        ? finaleNames[finaleNumber]
+        : `round of ${finaleNumber}`} ({roundNumber}/{rounds})
     <div class="d-flex justify-content-between align-items-center w-100">
         <div>
             <h1>Video 1</h1>
@@ -132,6 +141,11 @@
                 <button class="btn btn-outline-primary" on:click={resetVoting}
                     >Reset Voting</button
                 >
+            {:else if gameState.battleState === battleStateEnums.ENDED}
+                <h3>Voting has ended!</h3>
+                <button class="btn btn-outline-primary" on:click={resetVoting}
+                    >Reset Voting</button
+                >
             {/if}
         </div>
         <div>
@@ -145,7 +159,7 @@
                 allowfullscreen
                 title="Video 2"
             />
-            <h3 class="mt-3">{gameState.video1.name}</h3>
+            <h3 class="mt-3">{gameState.video2.name}</h3>
             <h3 class="mt-3">Votes: {gameState.vote2}</h3>
             <button
                 class="btn btn-secondary btn-lg mt-2"

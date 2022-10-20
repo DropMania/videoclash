@@ -22,9 +22,6 @@
         ? (errorText = 'Clash is full!')
         : (errorText = '')
     onMount(() => {
-        if (sessionStorage.getItem(`submitted-${params.id}`)) {
-            submitted = true
-        }
         supabase
             .from('Clash')
             .select('*')
@@ -35,6 +32,15 @@
                     errorText = 'Clash does not exist!'
                 } else {
                     clashData = data
+                    if (sessionStorage.getItem(`submitted-${params.id}`)) {
+                        if (
+                            Number(
+                                sessionStorage.getItem(`submitted-${params.id}`)
+                            ) >= clashData.video_per_person
+                        ) {
+                            submitted = true
+                        }
+                    }
                 }
                 loading = false
             })
@@ -67,7 +73,13 @@
             errorText = error.message
         } else {
             submitted = true
-            sessionStorage.setItem(`submitted-${params.id}`, '1')
+            let submittedCount = sessionStorage.getItem(
+                `submitted-${params.id}`
+            )
+            sessionStorage.setItem(
+                `submitted-${params.id}`,
+                submittedCount ? (Number(submittedCount) + 1).toString() : '1'
+            )
         }
         loadingbtn = false
     }
@@ -75,9 +87,15 @@
         disableSubmit = true
         let link = event.target.value
         try {
-            let params = new URLSearchParams(new URL(link).search)
-            if (params.get('v')) {
-                videoData = await getVideoData(params.get('v'))
+            let id = ''
+            if (link.includes('youtu.be')) {
+                id = link.split('youtu.be/')[1]
+            } else {
+                let params = new URLSearchParams(new URL(link).search)
+                id = params.get('v')
+            }
+            if (id) {
+                videoData = await getVideoData(id)
                 if (videoData) {
                     let duration = videoData.contentDetails.duration
                     let minutes = moment.duration(duration).asMinutes()

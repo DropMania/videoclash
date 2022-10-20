@@ -19,9 +19,9 @@ export async function getVideoData(id) {
 }
 
 export async function callBot(endpoint, params) {
-    let URL = 'https://videoclash-bot.herokuapp.com'
+    let URL = 'https://videoclash-bot.onrender.com'
     if (location.origin.startsWith('http://')) {
-        URL = 'http://localhost:3000'
+        URL = 'http://localhost:5000'
     }
     let res = await fetch(`${URL}/${endpoint}`, {
         headers: { 'Content-Type': 'application/json' },
