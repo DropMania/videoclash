@@ -39,6 +39,10 @@ const corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json())
 
+app.get('/', (req, res) => {
+    res.send('Nothing to see here')
+})
+
 app.post('/send_link', (req, res) => {
     const { channel, id } = req.body
     client.say(channel, `Submit your video here: ${BASE_URL}/#/submit/${id}`)

@@ -19,7 +19,7 @@ export async function getVideoData(id) {
 }
 
 export async function callBot(endpoint, params) {
-    let URL = 'https://videoclash-bot.vercel.app'
+    let URL = 'https://videoclash-bot.herokuapp.com'
     if (location.origin.startsWith('http://')) {
         URL = 'http://localhost:3000'
     }
