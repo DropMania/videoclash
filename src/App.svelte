@@ -53,4 +53,17 @@
 </nav>
 <div class="container text-center mt-5 d-flex flex-column align-items-center">
     <Router {routes} />
+    <div>
+        <a href="https://github.com/DropMania" target="_blank" class="copy">&copy; DropMania</a>
+    </div>
 </div>
+<style> 
+    .copy {
+        position: absolute;
+        bottom: 10px;
+        left: 0px;
+        width: 100vw;
+
+        text-align: center;
+    }
+</style>

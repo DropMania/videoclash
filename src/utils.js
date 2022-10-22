@@ -19,15 +19,20 @@ export async function getVideoData(id) {
 }
 
 export async function callBot(endpoint, params) {
+    let data = {}
     let URL = 'https://videoclash-bot.onrender.com'
     if (location.origin.startsWith('http://')) {
         URL = 'http://localhost:5000'
     }
-    let res = await fetch(`${URL}/${endpoint}`, {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-        body: JSON.stringify(params)
-    })
-    let data = await res.json()
+    try{
+        let res = await fetch(`${URL}/${endpoint}`, {
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+            body: JSON.stringify(params)
+        })
+        data = await res.json()
+    }catch(e){
+        
+    }
     return data
 }
