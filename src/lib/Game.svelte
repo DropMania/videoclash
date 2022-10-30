@@ -32,11 +32,12 @@
             if (!voted.includes(tags.username)) {
                 if (message === '1') {
                     gameState.vote1++
+                    voted.push(tags.username)
                 }
                 if (message === '2') {
                     gameState.vote2++
+                    voted.push(tags.username)
                 }
-                voted.push(tags.username)
             }
         }
     })

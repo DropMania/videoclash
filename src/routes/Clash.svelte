@@ -5,6 +5,7 @@
     import { onMount } from 'svelte'
     import Submissions from '../lib/Submissions.svelte'
     import Game from '../lib/Game.svelte'
+    import Edit from '../lib/Edit.svelte'
     export let params = {}
     let clashData = {}
     let errorText = ''
@@ -25,53 +26,55 @@
         vote1: 0,
         vote2: 0
     }
+    let editWindow = false
     if (!$user) {
         errorText = 'You need to log in to see this page!'
     }
     onMount(() => {
-        supabase
+        loadClash().then(() => {
+            loadSubmissions()
+            supabase
+                .from('ClashVideo')
+                .on('*', async (payload) => {
+                    if (payload.eventType === 'INSERT') {
+                        let id = ''
+                        if (payload.new.link.includes('youtu.be')) {
+                            id = payload.new.link.split('youtu.be/')[1]
+                        } else {
+                            let params = new URLSearchParams(
+                                new URL(payload.new.link).search
+                            )
+                            id = params.get('v')
+                        }
+                        let videoData = await getVideoData(id)
+                        submissions = submissions.concat({
+                            ...payload.new,
+                            videoData,
+                            youtubeId: id
+                        })
+                    }
+                    if (payload.eventType === 'DELETE') {
+                        submissions = submissions.filter(
+                            (submission) => submission.id !== payload.old.id
+                        )
+                    }
+                })
+                .subscribe()
+            loading = false
+        })
+    })
+    async function loadClash() {
+        let { data, error } = await supabase
             .from('Clash')
             .select('*')
             .eq('id', params.id)
             .single()
-            .then(({ error, data }) => {
-                if (error) {
-                    errorText = 'Clash does not exist!'
-                } else {
-                    clashData = data
-                    loadSubmissions()
-                    supabase
-                        .from('ClashVideo')
-                        .on('*', async (payload) => {
-                            if (payload.eventType === 'INSERT') {
-                                let id = ''
-                                if (payload.new.link.includes('youtu.be')) {
-                                    id = payload.new.link.split('youtu.be/')[1]
-                                } else {
-                                    let params = new URLSearchParams(
-                                        new URL(payload.new.link).search
-                                    )
-                                    id = params.get('v')
-                                }
-                                let videoData = await getVideoData(id)
-                                submissions = submissions.concat({
-                                    ...payload.new,
-                                    videoData,
-                                    youtubeId: id
-                                })
-                            }
-                            if (payload.eventType === 'DELETE') {
-                                submissions = submissions.filter(
-                                    (submission) =>
-                                        submission.id !== payload.old.id
-                                )
-                            }
-                        })
-                        .subscribe()
-                }
-                loading = false
-            })
-    })
+        if (error) {
+            errorText = 'Clash does not exist!'
+        } else {
+            clashData = data
+        }
+    }
     async function loadSubmissions() {
         let { error, data } = await supabase
             .from('ClashVideo')
@@ -134,7 +137,12 @@
         {errorText}
     </div>
 {:else}
-    <h1>{clashData.topic}</h1>
+    <h1>
+        {clashData.topic}
+        <button class="btn btn-secondary" on:click={() => (editWindow = true)}
+            >edit</button
+        >
+    </h1>
     {#if gameState.state == stateEnums.NOT_STARTED}
         <Submissions
             {submissions}
@@ -153,3 +161,5 @@
         SHOW RESULTS
     {/if}
 {/if}
+
+<Edit bind:open={editWindow} {clashData} />

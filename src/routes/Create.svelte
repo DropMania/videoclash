@@ -53,7 +53,7 @@
             </label>
         </div>
         <div class="form-group mt-3">
-            <label for="video_count" class="form-label mt-4">Song Count</label>
+            <label for="video_count" class="form-label mt-4">Video Count</label>
             <select
                 class="form-select"
                 id="video_count"
@@ -68,7 +68,7 @@
         </div>
         <div class="form-group mt-3">
             <label for="video_per_person" class="form-label mt-4"
-                >Song per User</label
+                >Videos per User</label
             >
             <select
                 class="form-select"

@@ -25,7 +25,7 @@
     })
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky">
     <div class="container-fluid">
         <a class="navbar-brand" href="/#/">VideoClash</a>
 
@@ -54,3 +54,11 @@
 <div class="container text-center mt-5 d-flex flex-column align-items-center">
     <Router {routes} />
 </div>
+
+<style>
+    .sticky {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+</style>
