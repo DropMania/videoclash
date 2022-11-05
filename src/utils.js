@@ -1,4 +1,5 @@
 import keys from './keys'
+import moment from 'moment'
 export function shortid(len = 11) {
     let result = ''
     let chars =
@@ -24,15 +25,48 @@ export async function callBot(endpoint, params) {
     if (location.origin.startsWith('http://')) {
         URL = 'http://localhost:5000'
     }
-    try{
+    try {
         let res = await fetch(`${URL}/${endpoint}`, {
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
             body: JSON.stringify(params)
         })
         data = await res.json()
-    }catch(e){
-        
-    }
+    } catch (e) {}
     return data
+}
+
+export async function validateLink(link, maxLen) {
+    let response = ''
+    let valid = false
+    let videoData = null
+    try {
+        let id = ''
+        if (link.includes('youtu.be')) {
+            id = link.split('youtu.be/')[1]
+        } else {
+            let params = new URLSearchParams(new URL(link).search)
+            id = params.get('v')
+        }
+        if (id) {
+            videoData = await getVideoData(id)
+            if (videoData) {
+                let duration = videoData.contentDetails.duration
+                let minutes = moment.duration(duration).asMinutes()
+                if (minutes <= maxLen) {
+                    valid = true
+                    response = ''
+                } else {
+                    response = 'the Video is too long!'
+                }
+            } else {
+                response = 'the Video doesnt exist!'
+            }
+        } else {
+            response = 'You need to paste a Youtube-Video link!'
+        }
+    } catch (e) {
+        response = 'You need to paste a Youtube-Video link!'
+    }
+    return { response, valid, videoData }
 }

@@ -2,7 +2,7 @@
     import supabase from '../supabase'
     import { user } from '../store'
     import { onMount } from 'svelte'
-    import { getVideoData } from '../utils'
+    import { getVideoData, validateLink } from '../utils'
     import moment from 'moment'
     export let params = {}
     let clashData = {}
@@ -84,34 +84,14 @@
     async function inputLink(event) {
         disableSubmit = true
         let link = event.target.value
-        try {
-            let id = ''
-            if (link.includes('youtu.be')) {
-                id = link.split('youtu.be/')[1]
-            } else {
-                let params = new URLSearchParams(new URL(link).search)
-                id = params.get('v')
-            }
-            if (id) {
-                videoData = await getVideoData(id)
-                if (videoData) {
-                    let duration = videoData.contentDetails.duration
-                    let minutes = moment.duration(duration).asMinutes()
-                    if (minutes <= clashData.max_video_length) {
-                        disableSubmit = false
-                        invalidVideo = ''
-                    } else {
-                        invalidVideo = 'the Video is too long!'
-                    }
-                } else {
-                    invalidVideo = 'the Video doesnt exist!'
-                }
-            } else {
-                invalidVideo = 'You need to paste a Youtube-Video link!'
-            }
-        } catch (e) {
-            invalidVideo = 'You need to paste a Youtube-Video link!'
-        }
+        let {
+            response,
+            valid,
+            videoData: vd
+        } = await validateLink(link, clashData.max_video_length)
+        disableSubmit = !valid
+        invalidVideo = response
+        videoData = vd
     }
 </script>
 

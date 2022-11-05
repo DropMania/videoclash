@@ -170,7 +170,8 @@
             >
         </div>
     </div>
-    <div class="progress w-100 mt-5 ">
+    <div class="mt-3"><h2>{votingTime}s</h2></div>
+    <div class="progress w-100 mt-2 ">
         <div
             class="progress-bar progress-bar-striped progress-bar-animated bg-success"
             role="progressbar"
