@@ -1,30 +1,35 @@
 <script>
     import supabase from '../supabase'
+    import { onMount } from 'svelte'
     export let open = false
     export let showBackdrop = true
     export let clashData
+    export let loadClash
     let loading = false
-    $: formData = {
-        ...clashData,
-        video_count: String(clashData.video_count),
-        video_per_person: String(clashData.video_per_person)
-    }
+    let formData = {}
+    onMount(() => {
+        formData = {
+            ...clashData,
+            video_count: String(clashData.video_count),
+            video_per_person: String(clashData.video_per_person)
+        }
+    })
     const modalClose = () => {
         open = false
     }
-    function updateClash() {
+    async function updateClash() {
         loading = true
-        supabase
+        let { error, data } = await supabase
             .from('Clash')
             .update(formData)
             .eq('id', clashData.id)
-            .then(({ data, error }) => {
-                if (error) {
-                    console.log('error', error)
-                } else {
-                    console.log('data', data)
-                }
-            })
+        if (!error) {
+            loadClash()
+            open = false
+        } else {
+            alert(error.message)
+        }
+
         loading = false
     }
 </script>

@@ -32,10 +32,10 @@
                     errorText = 'Clash does not exist!'
                 } else {
                     clashData = data
-                    if (sessionStorage.getItem(`submitted-${params.id}`)) {
+                    if (localStorage.getItem(`submitted-${params.id}`)) {
                         if (
                             Number(
-                                sessionStorage.getItem(`submitted-${params.id}`)
+                                localStorage.getItem(`submitted-${params.id}`)
                             ) >= clashData.video_per_person
                         ) {
                             submitted = true
@@ -73,10 +73,8 @@
             errorText = error.message
         } else {
             submitted = true
-            let submittedCount = sessionStorage.getItem(
-                `submitted-${params.id}`
-            )
-            sessionStorage.setItem(
+            let submittedCount = localStorage.getItem(`submitted-${params.id}`)
+            localStorage.setItem(
                 `submitted-${params.id}`,
                 submittedCount ? (Number(submittedCount) + 1).toString() : '1'
             )
