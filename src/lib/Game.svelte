@@ -1,10 +1,11 @@
 <script>
     import { onMount } from 'svelte'
-    import { Client } from 'tmi.js'
     import { user } from '../store'
     import { callBot } from '../utils'
     export let gameState = {}
     export let clashData = {}
+    export let battleStateEnums = {}
+    export let client = null
     let finaleNumber = gameState.submissions.length
     let roundNumber = 0
     let rounds = gameState.submissions.length / 2
@@ -13,35 +14,11 @@
         4: 'Semi Finals',
         2: 'Finals'
     }
-    const battleStateEnums = {
-        PICKED: 1,
-        VOTING: 2,
-        ENDED: 3,
-        FINSISH: 4
-    }
+    
     const maxVotingTime = clashData.vote_time || 45
     let votingTime = clashData.vote_time || 45
     let interval
-    let client = new Client({
-        channels: [$user.user_metadata.name]
-    })
-    client.connect()
-    let voted = []
-    // @ts-ignore
-    client.on('message', (channel, tags, message, self) => {
-        if (gameState.battleState === battleStateEnums.VOTING) {
-            if (!voted.includes(tags.username)) {
-                if (message === '1') {
-                    gameState.vote1++
-                    voted.push(tags.username)
-                }
-                if (message === '2') {
-                    gameState.vote2++
-                    voted.push(tags.username)
-                }
-            }
-        }
-    })
+    
     onMount(() => {
         pickVideos()
     })
@@ -73,8 +50,15 @@
     function startVoting() {
         votingTime = maxVotingTime
         gameState.battleState = battleStateEnums.VOTING
-        voted = []
-        callBot('start_vote', { channel: $user.user_metadata.name })
+        gameState.voted = []
+        if(clashData.allow_chat_submit){
+            client.say(
+                `#${$user.user_metadata.name}`,
+                `----------START VOTING----------`
+            )
+        }else{
+            callBot('start_vote', { channel: $user.user_metadata.name })
+        }
         startTimer()
     }
     function resetVoting() {
@@ -99,7 +83,14 @@
                 votingTime--
                 if (votingTime === 0) {
                     gameState.battleState = battleStateEnums.ENDED
-                    callBot('end_vote', { channel: $user.user_metadata.name })
+                    if(clashData.allow_chat_submit){
+                        client.say(
+                            `#${$user.user_metadata.name}`,
+                            `----------END VOTING----------`
+                        )
+                    }else{
+                        callBot('end_vote', { channel: $user.user_metadata.name })
+                    }
                 }
             }
         }, 1000)
@@ -156,7 +147,7 @@
             <iframe
                 width="560"
                 height="315"
-                src={`https://www.youtube.com/embed/${gameState.video2.youtubeId}`}
+                src={`https://www.youtube.com/embed/${gameState.video2.youtubeId}?rel=0`}
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
@@ -184,7 +175,7 @@
     <iframe
         width="560"
         height="315"
-        src={`https://www.youtube.com/embed/${gameState.winners[0].youtubeId}`}
+        src={`https://www.youtube.com/embed/${gameState.winners[0].youtubeId}?rel=0`}
         frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen

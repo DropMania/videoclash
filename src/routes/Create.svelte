@@ -8,7 +8,8 @@
         video_per_person: '1',
         max_video_length: 5,
         topic: '',
-        vote_time: 45
+        vote_time: 45,
+        allow_chat_submit: true,
     }
     let errorText = ''
     let loading = false
@@ -52,6 +53,12 @@
                     bind:value={formData.topic}
                 />
             </label>
+        </div>
+        <div class="form-group mt-3">
+            <div class="form-check form-switch">
+                <input bind:checked={formData.allow_chat_submit} class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+                <label class="form-check-label" for="flexSwitchCheckDefault" >Allow Chat Submissions</label>
+              </div>
         </div>
         <div class="form-group mt-3">
             <label for="video_count" class="form-label mt-4">Video Count</label>

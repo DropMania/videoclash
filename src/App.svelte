@@ -9,7 +9,8 @@
                 provider: 'twitch'
             },
             {
-                scopes: 'chat:read chat:edit'
+                scopes: 'chat:read chat:edit',
+                redirectTo: location.origin
             }
         )
     }

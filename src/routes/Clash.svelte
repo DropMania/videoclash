@@ -1,8 +1,11 @@
 <script>
+// @ts-nocheck
+
     import supabase from '../supabase'
     import { user } from '../store'
-    import { getVideoData } from '../utils'
+    import { getVideoData, validateLink } from '../utils'
     import { onMount } from 'svelte'
+    import { Client } from 'tmi.js'
     import Submissions from '../lib/Submissions.svelte'
     import Game from '../lib/Game.svelte'
     import Edit from '../lib/Edit.svelte'
@@ -17,6 +20,12 @@
         RUNNING: 3,
         SHOW_RESULTS: 4
     }
+    const battleStateEnums = {
+        PICKED: 1,
+        VOTING: 2,
+        ENDED: 3,
+        FINSISH: 4
+    }
     let gameState = {
         state: stateEnums.NOT_STARTED,
         submissions: [],
@@ -24,7 +33,8 @@
         video1: null,
         video2: null,
         vote1: 0,
-        vote2: 0
+        vote2: 0,
+        voted: [],
     }
     let editWindow = false
     if (!$user) {
@@ -62,6 +72,51 @@
                 .subscribe()
             loading = false
         })
+    })
+    let client = new Client({
+        channels: [$user.user_metadata.name],
+        identity: {
+            username: $user.user_metadata.name,
+            password: ()=>`oauth:${$user.access_token}`
+        }
+    })
+    client.connect()
+    // @ts-ignore
+    client.on('message', async (channel, tags, message, self) => {
+        if (gameState.battleState === battleStateEnums.VOTING) {
+            if (!gameState.voted.includes(tags.username)) {
+                if (message === '1') {
+                    gameState.vote1++
+                    gameState.voted.push(tags.username)
+                }
+                if (message === '2') {
+                    gameState.vote2++
+                    gameState.voted.push(tags.username)
+                }
+            }
+        }
+        if(gameState.state === stateEnums.NOT_STARTED && clashData.allow_chat_submit){
+            if(message.startsWith('!submit')){
+                if(submissions.length !== clashData.video_count){
+                    let link = message.split(' ')[1]
+                    let {valid,response} = await validateLink(link, clashData.max_video_length)
+                    if(valid){
+                        let { error, data } = await supabase
+                            .from('ClashVideo')
+                            .insert({ name:tags[ 'display-name' ], link, clash_id: params.id })
+                        if(error){
+                            client.say(channel,`@${tags[ 'display-name' ]} something went wrong!`)
+                        }else{
+                            client.say(channel,`@${tags[ 'display-name' ]} your submission has been added!`)
+                        }
+                    }else{
+                        client.say(channel,`@${tags[ 'display-name' ]} ${response}`)
+                    }
+                }else{
+                    client.say(channel,`@${tags[ 'display-name' ]} the submission limit has been reached!`)
+                }
+            }
+        }
     })
     async function loadClash() {
         let { data, error } = await supabase
@@ -173,7 +228,7 @@
             >Then GOOOO!</button
         >
     {:else if gameState.state == stateEnums.RUNNING}
-        <Game bind:gameState {clashData} />
+        <Game bind:gameState {clashData} {battleStateEnums} {client} />
     {:else if gameState.state == stateEnums.SHOW_RESULTS}
         SHOW RESULTS
     {/if}
