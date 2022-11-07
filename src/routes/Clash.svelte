@@ -139,8 +139,13 @@
 {:else}
     <h1>
         {clashData.topic}
-        <button class="btn btn-primary" on:click={() => (editWindow = true)}
-            ><svg
+    </h1>
+
+    {#if gameState.state == stateEnums.NOT_STARTED}
+        <button
+            class="btn btn-primary my-3"
+            on:click={() => (editWindow = true)}
+            >Edit Clash <svg
                 width="16"
                 height="16"
                 fill="currentColor"
@@ -156,8 +161,6 @@
                 />
             </svg></button
         >
-    </h1>
-    {#if gameState.state == stateEnums.NOT_STARTED}
         <Submissions
             {submissions}
             {clashData}
@@ -170,7 +173,7 @@
             >Then GOOOO!</button
         >
     {:else if gameState.state == stateEnums.RUNNING}
-        <Game bind:gameState />
+        <Game bind:gameState {clashData} />
     {:else if gameState.state == stateEnums.SHOW_RESULTS}
         SHOW RESULTS
     {/if}

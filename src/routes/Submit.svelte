@@ -113,9 +113,7 @@
         <div class="card border-primary mb-3 mt-5 w-100">
             <div class="card-body">
                 <form>
-                    <label for="name" class="col-form-label"
-                        >Share your name:</label
-                    >
+                    <label for="name" class="col-form-label">Your Name:</label>
                     <input
                         type="text"
                         class="form-control"

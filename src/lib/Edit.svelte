@@ -89,6 +89,22 @@
                             </select>
                         </div>
                         <div class="form-group mt-3">
+                            <label for="vote_time" class="form-label mt-4"
+                                >Voting Time</label
+                            >
+                            <input
+                                type="range"
+                                class="form-range"
+                                id="vote_time"
+                                min="20"
+                                max="60"
+                                bind:value={formData.vote_time}
+                            />
+                            <small class="form-text"
+                                >{formData.vote_time}s</small
+                            >
+                        </div>
+                        <div class="form-group mt-3">
                             <label
                                 for="video_per_person"
                                 class="form-label mt-4">Videos per User</label
@@ -102,7 +118,8 @@
                                 <option>2</option>
                                 <option>3</option>
                                 <option>4</option>
-                                <option>999</option>
+                                <option>5</option>
+                                <option value="999">Infinite</option>
                             </select>
                         </div>
                         <div class="form-group mt-3">

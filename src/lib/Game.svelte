@@ -4,6 +4,7 @@
     import { user } from '../store'
     import { callBot } from '../utils'
     export let gameState = {}
+    export let clashData = {}
     let finaleNumber = gameState.submissions.length
     let roundNumber = 0
     let rounds = gameState.submissions.length / 2
@@ -18,8 +19,8 @@
         ENDED: 3,
         FINSISH: 4
     }
-    const maxVotingTime = 45
-    let votingTime = 45
+    const maxVotingTime = clashData.vote_time || 45
+    let votingTime = clashData.vote_time || 45
     let interval
     let client = new Client({
         channels: [$user.user_metadata.name]
