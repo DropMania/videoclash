@@ -93,7 +93,7 @@
                 })
                 let data = await res.json()
                 $user.access_token = data.token
-                return data.token
+                return 'oauth:' + data.token
             }
         }
     })
@@ -102,6 +102,11 @@
     } else {
         errorText = 'Something went wrong, please log in again'
     }
+    client.on('redeem', async (channel, username, reward, tags, redeemMsg) => {
+        if (reward === redemptionId) {
+            submitVideo(channel, tags['display-name'], redeemMsg)
+        }
+    })
     client.on('message', async (channel, tags, message, self) => {
         if (gameState.battleState === battleStateEnums.VOTING) {
             if (!gameState.voted.includes(tags.username)) {
@@ -120,43 +125,11 @@
             clashData.allow_chat_submit
         ) {
             if (message.startsWith('!submit')) {
-                if (submissions.length !== clashData.video_count) {
-                    let link = message.split(' ')[1]
-                    let { valid, response } = await validateLink(
-                        link,
-                        clashData.max_video_length
-                    )
-                    if (valid) {
-                        let { error, data } = await supabase
-                            .from('ClashVideo')
-                            .insert({
-                                name: tags['display-name'],
-                                link,
-                                clash_id: params.id
-                            })
-                        if (error) {
-                            client.say(
-                                channel,
-                                `@${tags['display-name']} something went wrong!`
-                            )
-                        } else {
-                            client.say(
-                                channel,
-                                `@${tags['display-name']} your submission has been added!`
-                            )
-                        }
-                    } else {
-                        client.say(
-                            channel,
-                            `@${tags['display-name']} ${response}`
-                        )
-                    }
-                } else {
-                    client.say(
-                        channel,
-                        `@${tags['display-name']} the submission limit has been reached!`
-                    )
-                }
+                submitVideo(
+                    channel,
+                    tags['display-name'],
+                    message.split(' ')[1]
+                )
             }
         }
     })
@@ -208,7 +181,7 @@
     }
     async function startGame() {
         gameState.state = stateEnums.SHOW_START
-        redemptionId = ''
+        deleteRedemption()
     }
     function go() {
         gameState.state = stateEnums.RUNNING
@@ -243,7 +216,8 @@
                     body: JSON.stringify({
                         title,
                         cost: 100,
-                        prompt: 'Submit a video to the clash'
+                        prompt: 'Submit a video to the clash',
+                        is_user_input_required: true
                     })
                 }
             )
@@ -251,6 +225,49 @@
             if (redemptionData.data) {
                 redemptionId = redemptionData.data[0].id
             }
+        }
+    }
+    async function deleteRedemption() {
+        let res = await fetch(
+            `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}&id=${redemptionId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Client-Id': keys.twitchClientId,
+                    Authorization: `Bearer ${$user.access_token}`
+                }
+            }
+        )
+        redemptionId = ''
+    }
+    async function submitVideo(channel, username, link) {
+        if (submissions.length !== clashData.video_count) {
+            let { valid, response } = await validateLink(
+                link,
+                clashData.max_video_length
+            )
+            if (valid) {
+                let { error, data } = await supabase.from('ClashVideo').insert({
+                    name: username,
+                    link,
+                    clash_id: params.id
+                })
+                if (error) {
+                    client.say(channel, `@${username} something went wrong!`)
+                } else {
+                    client.say(
+                        channel,
+                        `@${username} your submission has been added!`
+                    )
+                }
+            } else {
+                client.say(channel, `@${username} ${response}`)
+            }
+        } else {
+            client.say(
+                channel,
+                `@${username} the submission limit has been reached!`
+            )
         }
     }
 </script>
