@@ -9,6 +9,7 @@
     import Submissions from '../lib/Submissions.svelte'
     import Game from '../lib/Game.svelte'
     import Edit from '../lib/Edit.svelte'
+    import keys from '../keys'
     export let params = {}
     let clashData = {}
     let errorText = ''
@@ -81,7 +82,21 @@
         }
     })
     client.connect()
-    // @ts-ignore
+    client.on('connected', async (address, port) => {
+        /* let res = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}`,{
+            method: 'POST',
+            headers: {
+                'Client-Id': keys.twitchClientId,
+                'Authorization': `Bearer ${$user.access_token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "title": "Submit a video",
+                "cost": 100,
+                "prompt": "Submit a video to the clash",
+            })
+        }) */
+    })
     client.on('message', async (channel, tags, message, self) => {
         if (gameState.battleState === battleStateEnums.VOTING) {
             if (!gameState.voted.includes(tags.username)) {
