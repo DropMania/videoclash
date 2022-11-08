@@ -27,11 +27,13 @@
 </script>
 
 <div class="d-flex gap-5">
+    {#if clashData.enable_reward_submission}
     <button
         type="button"
         class="btn btn-outline-secondary mt-3 btn-lg"
         on:click={() => dispatch('createRedemption')}>Create Redemption!</button
     >
+    {:else}
     <button
         type="button"
         class="btn btn-outline-secondary mt-3 btn-lg"
@@ -50,6 +52,7 @@
             />
         {/if}
     </button>
+    {/if}
 </div>
 
 <button

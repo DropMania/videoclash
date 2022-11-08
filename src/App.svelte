@@ -2,7 +2,7 @@
     import Router from 'svelte-spa-router'
     import routes from './routes'
     import supabase from './supabase'
-    import { user } from './store'
+    import { user, twitch_token } from './store'
     async function signInWithTwitch() {
         const { user, session, error } = await supabase.auth.signIn(
             {
@@ -20,7 +20,7 @@
     }
     supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
-            $user = { ...session.user, access_token: session.provider_token }
+            $user = { ...session.user}
             if (session.provider_refresh_token) {
                 localStorage.setItem(
                     'twitch_refresh_token',

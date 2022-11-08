@@ -2,7 +2,7 @@
     // @ts-nocheck
 
     import supabase from '../supabase'
-    import { user } from '../store'
+    import { user, twitch_token } from '../store'
     import { getVideoData, validateLink } from '../utils'
     import { onMount } from 'svelte'
     import { Client } from 'tmi.js'
@@ -92,7 +92,7 @@
                     })
                 })
                 let data = await res.json()
-                $user.access_token = data.token
+                $twitch_token = data.token
                 return 'oauth:' + data.token
             }
         }
@@ -103,8 +103,14 @@
         errorText = 'Something went wrong, please log in again'
     }
     client.on('redeem', async (channel, username, reward, tags, redeemMsg) => {
+        console.log(reward,tags,redeemMsg)
         if (reward === redemptionId) {
-            submitVideo(channel, tags['display-name'], redeemMsg)
+            let success = await submitVideo(channel, tags['display-name'], redeemMsg)
+            if(!success){
+                //TODO: Cancel redemption
+            }else{
+                //TODO: Mark redemption as fulfilled
+            }
         }
     })
     client.on('message', async (channel, tags, message, self) => {
@@ -122,7 +128,8 @@
         }
         if (
             gameState.state === stateEnums.NOT_STARTED &&
-            clashData.allow_chat_submit
+            clashData.allow_chat_submit &&
+            !clashData.enable_reward_submission
         ) {
             if (message.startsWith('!submit')) {
                 submitVideo(
@@ -195,7 +202,7 @@
                 method: 'GET',
                 headers: {
                     'Client-ID': keys.twitchClientId,
-                    Authorization: `Bearer ${$user.access_token}`
+                    Authorization: `Bearer ${$twitch_token}`
                 }
             }
         )
@@ -210,14 +217,16 @@
                     method: 'POST',
                     headers: {
                         'Client-Id': keys.twitchClientId,
-                        Authorization: `Bearer ${$user.access_token}`,
+                        Authorization: `Bearer ${$twitch_token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         title,
-                        cost: 100,
+                        cost: clashData.reward_cost,
                         prompt: 'Submit a video to the clash',
-                        is_user_input_required: true
+                        is_user_input_required: true,
+                        //is_max_per_user_per_stream_enabled: true,
+                        //max_per_user_per_stream: clashData.video_per_person
                     })
                 }
             )
@@ -234,13 +243,14 @@
                 method: 'DELETE',
                 headers: {
                     'Client-Id': keys.twitchClientId,
-                    Authorization: `Bearer ${$user.access_token}`
+                    Authorization: `Bearer ${$twitch_token}`
                 }
             }
         )
         redemptionId = ''
     }
     async function submitVideo(channel, username, link) {
+        let submitted = false
         if (submissions.length !== clashData.video_count) {
             let { valid, response } = await validateLink(
                 link,
@@ -255,6 +265,7 @@
                 if (error) {
                     client.say(channel, `@${username} something went wrong!`)
                 } else {
+                    submitted = true
                     client.say(
                         channel,
                         `@${username} your submission has been added!`
@@ -269,6 +280,7 @@
                 `@${username} the submission limit has been reached!`
             )
         }
+        return submitted
     }
 </script>
 

@@ -10,6 +10,8 @@
         topic: '',
         vote_time: 45,
         allow_chat_submit: true,
+        enable_reward_submission: false,
+        reward__cost: 500,
     }
     let errorText = ''
     let loading = false
@@ -56,10 +58,30 @@
         </div>
         <div class="form-group mt-3">
             <div class="form-check form-switch">
-                <input bind:checked={formData.allow_chat_submit} class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                <label class="form-check-label" for="flexSwitchCheckDefault" >Allow Chat Submissions</label>
+                <input bind:checked={formData.enable_reward_submission} class="form-check-input" type="checkbox" id="enable_reward_submission">
+                <label class="form-check-label" for="enable_reward_submission" >Enable Submissions through Channel Points</label>
               </div>
         </div>
+        {#if formData.enable_reward_submission}
+            <div class="form-group mt-3">
+                <label for="reward__cost" class="form-label mt-4"
+                    >Cost of Submission
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="reward__cost"
+                        bind:value={formData.reward_cost}
+                    />
+                </label>
+            </div>
+        {:else}
+            <div class="form-group mt-3">
+                <div class="form-check form-switch">
+                    <input bind:checked={formData.allow_chat_submit} class="form-check-input" type="checkbox" id="allow_chat_submit">
+                    <label class="form-check-label" for="allow_chat_submit" >Allow Chat Submissions</label>
+                </div>
+            </div>
+        {/if}
         <div class="form-group mt-3">
             <label for="video_count" class="form-label mt-4">Video Count</label>
             <select
