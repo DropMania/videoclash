@@ -16,10 +16,17 @@
     }
     async function signout() {
         const { error } = await supabase.auth.signOut()
+        localStorage.removeItem('twitch_refresh_token')
     }
     supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
             $user = { ...session.user, access_token: session.provider_token }
+            if (session.provider_refresh_token) {
+                localStorage.setItem(
+                    'twitch_refresh_token',
+                    session.provider_refresh_token
+                )
+            }
         } else {
             $user = null
         }

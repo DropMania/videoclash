@@ -30,6 +30,11 @@
     <button
         type="button"
         class="btn btn-outline-secondary mt-3 btn-lg"
+        on:click={() => dispatch('createRedemption')}>Create Redemption!</button
+    >
+    <button
+        type="button"
+        class="btn btn-outline-secondary mt-3 btn-lg"
         on:click={copyLink}>Copy Link!</button
     >
     <button

@@ -1,5 +1,5 @@
 <script>
-// @ts-nocheck
+    // @ts-nocheck
 
     import supabase from '../supabase'
     import { user } from '../store'
@@ -35,9 +35,10 @@
         video2: null,
         vote1: 0,
         vote2: 0,
-        voted: [],
+        voted: []
     }
     let editWindow = false
+    let redemptionId = ''
     if (!$user) {
         errorText = 'You need to log in to see this page!'
     }
@@ -78,25 +79,29 @@
         channels: [$user.user_metadata.name],
         identity: {
             username: $user.user_metadata.name,
-            password: ()=>`oauth:${$user.access_token}`
+            password: async () => {
+                let res = await fetch('https://vc-refresh.vercel.app/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        refresh_token: localStorage.getItem(
+                            'twitch_refresh_token'
+                        )
+                    })
+                })
+                let data = await res.json()
+                $user.access_token = data.token
+                return data.token
+            }
         }
     })
-    client.connect()
-    client.on('connected', async (address, port) => {
-        /* let res = await fetch(`https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}`,{
-            method: 'POST',
-            headers: {
-                'Client-Id': keys.twitchClientId,
-                'Authorization': `Bearer ${$user.access_token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "title": "Submit a video",
-                "cost": 100,
-                "prompt": "Submit a video to the clash",
-            })
-        }) */
-    })
+    if (localStorage.getItem('twitch_refresh_token')) {
+        client.connect()
+    } else {
+        errorText = 'Something went wrong, please log in again'
+    }
     client.on('message', async (channel, tags, message, self) => {
         if (gameState.battleState === battleStateEnums.VOTING) {
             if (!gameState.voted.includes(tags.username)) {
@@ -110,25 +115,47 @@
                 }
             }
         }
-        if(gameState.state === stateEnums.NOT_STARTED && clashData.allow_chat_submit){
-            if(message.startsWith('!submit')){
-                if(submissions.length !== clashData.video_count){
+        if (
+            gameState.state === stateEnums.NOT_STARTED &&
+            clashData.allow_chat_submit
+        ) {
+            if (message.startsWith('!submit')) {
+                if (submissions.length !== clashData.video_count) {
                     let link = message.split(' ')[1]
-                    let {valid,response} = await validateLink(link, clashData.max_video_length)
-                    if(valid){
+                    let { valid, response } = await validateLink(
+                        link,
+                        clashData.max_video_length
+                    )
+                    if (valid) {
                         let { error, data } = await supabase
                             .from('ClashVideo')
-                            .insert({ name:tags[ 'display-name' ], link, clash_id: params.id })
-                        if(error){
-                            client.say(channel,`@${tags[ 'display-name' ]} something went wrong!`)
-                        }else{
-                            client.say(channel,`@${tags[ 'display-name' ]} your submission has been added!`)
+                            .insert({
+                                name: tags['display-name'],
+                                link,
+                                clash_id: params.id
+                            })
+                        if (error) {
+                            client.say(
+                                channel,
+                                `@${tags['display-name']} something went wrong!`
+                            )
+                        } else {
+                            client.say(
+                                channel,
+                                `@${tags['display-name']} your submission has been added!`
+                            )
                         }
-                    }else{
-                        client.say(channel,`@${tags[ 'display-name' ]} ${response}`)
+                    } else {
+                        client.say(
+                            channel,
+                            `@${tags['display-name']} ${response}`
+                        )
                     }
-                }else{
-                    client.say(channel,`@${tags[ 'display-name' ]} the submission limit has been reached!`)
+                } else {
+                    client.say(
+                        channel,
+                        `@${tags['display-name']} the submission limit has been reached!`
+                    )
                 }
             }
         }
@@ -179,12 +206,52 @@
             errorText = error.message
         }
     }
-    function startGame() {
+    async function startGame() {
         gameState.state = stateEnums.SHOW_START
+        redemptionId = ''
     }
     function go() {
         gameState.state = stateEnums.RUNNING
         gameState.submissions = submissions.sort(() => Math.random() - 0.5)
+    }
+    async function createRedemption() {
+        let title = '[VideoClash] Submit a video'
+        let listRes = await fetch(
+            `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Client-ID': keys.twitchClientId,
+                    Authorization: `Bearer ${$user.access_token}`
+                }
+            }
+        )
+        let listData = await listRes.json()
+        let existing = listData.data.find((d) => d.title === title)
+        if (existing) {
+            redemptionId = existing.id
+        } else {
+            let redemptionRes = await fetch(
+                `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Client-Id': keys.twitchClientId,
+                        Authorization: `Bearer ${$user.access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title,
+                        cost: 100,
+                        prompt: 'Submit a video to the clash'
+                    })
+                }
+            )
+            let redemptionData = await redemptionRes.json()
+            if (redemptionData.data) {
+                redemptionId = redemptionData.data[0].id
+            }
+        }
     }
 </script>
 
@@ -236,6 +303,7 @@
             {clashData}
             on:deleteSubmission={deleteSubmission}
             on:startGame={startGame}
+            on:createRedemption={createRedemption}
         />
     {:else if gameState.state == stateEnums.SHOW_START}
         <h3 class="mt-5">Are you ready?</h3>

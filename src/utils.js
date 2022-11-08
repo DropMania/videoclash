@@ -29,6 +29,7 @@ export async function callBot(endpoint, params) {
         let res = await fetch(`${URL}/${endpoint}`, {
             headers: { 'Content-Type': 'application/json' },
             method: 'POST',
+            credentials: 'same-origin',
             body: JSON.stringify(params)
         })
         data = await res.json()
