@@ -1,9 +1,11 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { callBot } from '../utils'
-    import { user } from '../store'
+    import { callBot } from '../../utils'
+    import { user } from '../../store'
     export let submissions
     export let clashData
+    export let redemptionId
+    export let redemptionLoading
     let copyInput = {}
     const dispatch = createEventDispatcher()
     let sending = false
@@ -12,46 +14,58 @@
         copyInput.select()
         document.execCommand('copy')
     }
-    async function sendLink() {
-        sending = true
-        try {
-            await callBot('send_link', {
-                channel: $user.user_metadata.name,
-                id: clashData.id
-            })
-        } catch (e) {
-            console.log(e)
-        }
-        sending = false
-    }
 </script>
 
 <div class="d-flex gap-5">
     {#if clashData.enable_reward_submission}
-    <button
-        type="button"
-        class="btn btn-outline-secondary mt-3 btn-lg"
-        on:click={() => dispatch('createRedemption')}>Create Redemption!</button
-    >
-    {:else}
-    <button
-        type="button"
-        class="btn btn-outline-secondary mt-3 btn-lg"
-        on:click={copyLink}>Copy Link!</button
-    >
-    <button
-        type="button"
-        class="btn btn-outline-secondary mt-3 btn-lg"
-        on:click={sendLink}
-        >Send Link to Chat!
-        {#if sending}
-            <span
-                class="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-            />
+        {#if redemptionId}
+            <button
+                type="button"
+                class="btn btn-outline-secondary mt-3 btn-lg"
+                on:click={() => dispatch('deleteRedemption')}
+                >Deactivate Redemption!
+                {#if redemptionLoading}
+                    <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                {/if}
+            </button>
+        {:else}
+            <button
+                type="button"
+                class="btn btn-outline-secondary mt-3 btn-lg"
+                on:click={() => dispatch('createRedemption')}
+                >Activate Redemption!
+                {#if redemptionLoading}
+                    <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                {/if}
+            </button>
         {/if}
-    </button>
+    {:else}
+        <button
+            type="button"
+            class="btn btn-outline-secondary mt-3 btn-lg"
+            on:click={copyLink}>Copy Link!</button
+        >
+        <button
+            type="button"
+            class="btn btn-outline-secondary mt-3 btn-lg"
+            on:click={() => dispatch('sendLink')}
+            >Send Link to Chat!
+            {#if sending}
+                <span
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                />
+            {/if}
+        </button>
     {/if}
 </div>
 
@@ -67,7 +81,7 @@
     type="text"
     class="not-shown"
     bind:this={copyInput}
-    value={`${location.origin}/#/submit/${clashData.id}`}
+    value={`${location.origin}/#/c/submit/${clashData.id}`}
 />
 <div
     class="card border-primary mb-3 mt-5 overflow-auto"

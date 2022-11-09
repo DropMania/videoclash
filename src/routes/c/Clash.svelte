@@ -1,14 +1,14 @@
 <script>
     // @ts-nocheck
 
-    import supabase from '../supabase'
-    import { user, twitch_token } from '../store'
-    import { getVideoData, validateLink } from '../utils'
+    import supabase from '../../supabase'
+    import { user, twitch_token } from '../../store'
+    import { getVideoData, validateLink } from '../../utils'
     import { onMount } from 'svelte'
-    import Submissions from '../lib/Submissions.svelte'
-    import Game from '../lib/Game.svelte'
-    import Edit from '../lib/Edit.svelte'
-    import keys from '../keys'
+    import Submissions from '../../lib/c/Submissions.svelte'
+    import Game from '../../lib/c/Game.svelte'
+    import Edit from '../../lib/c/Edit.svelte'
+    import keys from '../../keys'
     export let params = {}
     let clashData = {}
     let errorText = ''
@@ -38,6 +38,7 @@
     }
     let editWindow = false
     let redemptionId = ''
+    let redemptionLoading = false
     if (!$user) {
         errorText = 'You need to log in to see this page!'
     }
@@ -102,13 +103,58 @@
         errorText = 'Something went wrong, please log in again'
     }
     client.on('redeem', async (channel, username, reward, tags, redeemMsg) => {
-        console.log(reward,tags,redeemMsg)
         if (reward === redemptionId) {
-            let success = await submitVideo(channel, tags['display-name'], redeemMsg)
-            if(!success){
-                //TODO: Cancel redemption
-            }else{
-                //TODO: Mark redemption as fulfilled
+            let success = await submitVideo(
+                channel,
+                tags['display-name'],
+                redeemMsg
+            )
+            let redemptionsRes = await fetch(
+                `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${$user.user_metadata.provider_id}&status=UNFULFILLED&reward_id=${reward}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Client-ID': keys.twitchClientId,
+                        Authorization: `Bearer ${$twitch_token}`
+                    }
+                }
+            )
+            let redemptions = await redemptionsRes.json()
+            let redemption = redemptions.data.find(
+                (redemption) => redemption.user_login === tags.username
+            )
+            if (redemption) {
+                if (!success) {
+                    await fetch(
+                        `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${$user.user_metadata.provider_id}&id=${redemption.id}&reward_id=${reward}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Client-ID': keys.twitchClientId,
+                                Authorization: `Bearer ${$twitch_token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                status: 'CANCELED'
+                            })
+                        }
+                    )
+                } else {
+                    await fetch(
+                        `https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${$user.user_metadata.provider_id}&id=${redemption.id}&reward_id=${reward}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Client-ID': keys.twitchClientId,
+                                Authorization: `Bearer ${$twitch_token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                status: 'FULFILLED'
+                            })
+                        }
+                    )
+                }
             }
         }
     })
@@ -187,7 +233,9 @@
     }
     async function startGame() {
         gameState.state = stateEnums.SHOW_START
-        deleteRedemption()
+        if (redemptionId) {
+            deleteRedemption()
+        }
     }
     function go() {
         gameState.state = stateEnums.RUNNING
@@ -195,6 +243,7 @@
     }
     async function createRedemption() {
         let title = '[VideoClash] Submit a video'
+        redemptionLoading = true
         let listRes = await fetch(
             `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}`,
             {
@@ -223,7 +272,7 @@
                         title,
                         cost: clashData.reward_cost,
                         prompt: 'Submit a video to the clash',
-                        is_user_input_required: true,
+                        is_user_input_required: true
                         //is_max_per_user_per_stream_enabled: true,
                         //max_per_user_per_stream: clashData.video_per_person
                     })
@@ -234,8 +283,10 @@
                 redemptionId = redemptionData.data[0].id
             }
         }
+        redemptionLoading = false
     }
     async function deleteRedemption() {
+        redemptionLoading = true
         let res = await fetch(
             `https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id=${$user.user_metadata.provider_id}&id=${redemptionId}`,
             {
@@ -247,6 +298,7 @@
             }
         )
         redemptionId = ''
+        redemptionLoading = false
     }
     async function submitVideo(channel, username, link) {
         let submitted = false
@@ -280,6 +332,12 @@
             )
         }
         return submitted
+    }
+    function sendLink() {
+        client.say(
+            $user.user_metadata.name,
+            `Submit your video here: ${location.origin}/#/c/submit/${clashData.id}`
+        )
     }
 </script>
 
@@ -329,9 +387,13 @@
         <Submissions
             {submissions}
             {clashData}
+            bind:redemptionId
+            bind:redemptionLoading
             on:deleteSubmission={deleteSubmission}
             on:startGame={startGame}
             on:createRedemption={createRedemption}
+            on:deleteRedemption={deleteRedemption}
+            on:sendLink={sendLink}
         />
     {:else if gameState.state == stateEnums.SHOW_START}
         <h3 class="mt-5">Are you ready?</h3>

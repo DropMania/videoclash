@@ -1,9 +1,7 @@
 <script>
-    import supabase from '../supabase'
-    import { user } from '../store'
+    import supabase from '../../supabase'
     import { onMount } from 'svelte'
-    import { getVideoData, validateLink } from '../utils'
-    import moment from 'moment'
+    import { validateLink } from '../../utils'
     export let params = {}
     let clashData = {}
     let errorText = ''
