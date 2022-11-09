@@ -19,24 +19,6 @@ export async function getVideoData(id) {
     return data.items[0]
 }
 
-export async function callBot(endpoint, params) {
-    let data = {}
-    let URL = 'https://videoclash-bot.onrender.com'
-    if (location.origin.startsWith('http://')) {
-        URL = 'http://localhost:5000'
-    }
-    try {
-        let res = await fetch(`${URL}/${endpoint}`, {
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-            credentials: 'same-origin',
-            body: JSON.stringify(params)
-        })
-        data = await res.json()
-    } catch (e) {}
-    return data
-}
-
 export async function validateLink(link, maxLen) {
     let response = ''
     let valid = false

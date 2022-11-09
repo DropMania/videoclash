@@ -1,7 +1,6 @@
 <script>
     import { onMount } from 'svelte'
     import { user } from '../../store'
-    import { callBot } from '../../utils'
     export let gameState = {}
     export let clashData = {}
     export let battleStateEnums = {}
@@ -51,14 +50,11 @@
         votingTime = maxVotingTime
         gameState.battleState = battleStateEnums.VOTING
         gameState.voted = []
-        if (clashData.allow_chat_submit) {
-            client.say(
-                `#${$user.user_metadata.name}`,
-                `----------START VOTING----------`
-            )
-        } else {
-            callBot('start_vote', { channel: $user.user_metadata.name })
-        }
+        client.say(
+            `#${$user.user_metadata.name}`,
+            `----------START VOTING----------`
+        )
+
         startTimer()
     }
     function resetVoting() {
@@ -83,16 +79,11 @@
                 votingTime--
                 if (votingTime === 0) {
                     gameState.battleState = battleStateEnums.ENDED
-                    if (clashData.allow_chat_submit) {
-                        client.say(
-                            `#${$user.user_metadata.name}`,
-                            `----------END VOTING----------`
-                        )
-                    } else {
-                        callBot('end_vote', {
-                            channel: $user.user_metadata.name
-                        })
-                    }
+
+                    client.say(
+                        `#${$user.user_metadata.name}`,
+                        `----------END VOTING----------`
+                    )
                 }
             }
         }, 1000)
