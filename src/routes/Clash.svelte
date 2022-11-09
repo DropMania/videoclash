@@ -5,7 +5,6 @@
     import { user, twitch_token } from '../store'
     import { getVideoData, validateLink } from '../utils'
     import { onMount } from 'svelte'
-    import { Client } from 'tmi.js'
     import Submissions from '../lib/Submissions.svelte'
     import Game from '../lib/Game.svelte'
     import Edit from '../lib/Edit.svelte'
@@ -75,7 +74,7 @@
             loading = false
         })
     })
-    let client = new Client({
+    let client = new tmi.Client({
         channels: [$user.user_metadata.name],
         identity: {
             username: $user.user_metadata.name,
