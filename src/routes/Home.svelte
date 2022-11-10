@@ -1,5 +1,5 @@
 <script>
-    import { user } from '../../store'
+    import { user } from '../store'
 </script>
 
 {#if $user}
@@ -12,7 +12,7 @@
         </a>
         <a href="/#/b/create">
             <button type="button" class="btn btn-secondary btn-lg mt-5">
-                The Best Song</button
+                The Best Video</button
             >
         </a>
     </div>

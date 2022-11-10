@@ -3,7 +3,7 @@
 
     import supabase from '../../supabase'
     import { user, twitch_token } from '../../store'
-    import { getVideoData, validateLink } from '../../utils'
+    import { getVideoData, validateLink, getTwitchToken } from '../../utils'
     import { onMount } from 'svelte'
     import Submissions from '../../lib/c/Submissions.svelte'
     import Game from '../../lib/c/Game.svelte'
@@ -79,22 +79,7 @@
         channels: [$user.user_metadata.name],
         identity: {
             username: $user.user_metadata.name,
-            password: async () => {
-                let res = await fetch('https://vc-refresh.vercel.app/refresh', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        refresh_token: localStorage.getItem(
-                            'twitch_refresh_token'
-                        )
-                    })
-                })
-                let data = await res.json()
-                $twitch_token = data.token
-                return 'oauth:' + data.token
-            }
+            password: getTwitchToken
         }
     })
     if (localStorage.getItem('twitch_refresh_token')) {

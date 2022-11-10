@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { callBot } from '../../utils'
     import { user } from '../../store'
     export let submissions
     export let clashData
