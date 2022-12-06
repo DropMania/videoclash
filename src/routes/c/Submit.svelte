@@ -63,6 +63,7 @@
             })
     }
     async function submitVideo() {
+        if (loadingbtn) return
         loadingbtn = true
         let { error, data } = await supabase
             .from('ClashVideo')

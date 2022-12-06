@@ -257,9 +257,9 @@
                         title,
                         cost: clashData.reward_cost,
                         prompt: 'Submit a video to the clash',
-                        is_user_input_required: true
-                        //is_max_per_user_per_stream_enabled: true,
-                        //max_per_user_per_stream: clashData.video_per_person
+                        is_user_input_required: true,
+                        is_max_per_user_per_stream_enabled: true,
+                        max_per_user_per_stream: clashData.video_per_person
                     })
                 }
             )

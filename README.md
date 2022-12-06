@@ -2,6 +2,11 @@
 
 Create a Clash to let your community submit Videos and let them vote wich is the best.
 
+## Roadmap
+
+-   Moderator page / features
+-   Pay to Win (Buy more votes with subs/bits)
+
 # Game Modes
 
 ## Tournament
