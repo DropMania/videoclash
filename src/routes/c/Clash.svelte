@@ -49,6 +49,7 @@
                 .from('ClashVideo')
                 .on('*', async (payload) => {
                     if (payload.eventType === 'INSERT') {
+                        if (payload.new.clash_id !== clashData.id) return
                         let id = ''
                         if (payload.new.link.includes('youtu.be')) {
                             id = payload.new.link.split('youtu.be/')[1]
