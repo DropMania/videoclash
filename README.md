@@ -22,6 +22,7 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 -   TikTok integration [Docs - Embeded vids](https://developers.tiktok.com/doc/embed-videos/)
 -   Spotify integration
 -   Twitch-Clip integration
+-   YT-Shorts integration
 
 
 # Game Modes

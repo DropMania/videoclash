@@ -13,6 +13,17 @@
         copyInput.select()
         document.execCommand('copy')
     }
+
+    let approvalState={
+        NOT_APPROVED:0,
+        APPROVED:1,
+        DISAPROVE:2
+    }
+    let approvalTexts=[
+        'Not-Approved',
+        'Approved',
+        'Disapproved'
+    ];
 </script>
 
 <div class="d-flex gap-5">
@@ -118,7 +129,16 @@
                                 />
                             </a>
                         </td>
-                        <td>{submission.videoData.snippet.title}</td>
+                        <td>
+                            <!-- {submission.videoData.snippet.title} -->
+                            <div>
+                                {submission.videoData.snippet.title}
+                                <br/>
+                                <h4>
+                                    <span class="badge rounded-pill {submission.approval === 0 ? 'bg-danger' : submission.approval === 1 ? 'bg-success' : 'bg-warning'  } ">{approvalTexts[submission.approval]}</span>
+                                </h4>
+                            </div>
+                        </td>
                         <td>
                             {submission.name}
                         </td>

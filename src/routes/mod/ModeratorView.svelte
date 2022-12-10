@@ -5,12 +5,13 @@
     import { getVideoData, validateLink, getTwitchToken } from '../../utils'
     import keys from '../../keys'
     import { element } from 'svelte/internal';
+    import { chat_submissions } from '../../store.js';
     export let params = {};
 
     let clashData = {}
     let errorText = ''
     let loading = true
-    let submissions = []
+    var submissions = []
     let stateEnums = {
         NOT_STARTED: 1,
         SHOW_START: 2,
@@ -35,18 +36,23 @@
     }
     let approvalState={
         NOT_APPROVED:0,
-        APPROVED:1
+        APPROVED:1,
+        DISAPROVE:2
     }
     let approvalTexts=[
         'Not-Approved',
-        'Approved'
+        'Approved',
+        'Disapproved'
     ];
-    const dispatch = createEventDispatcher()
+
     onMount(()=>{
 
         loadClash().then(() => {
-            loadSubmissions()
-            supabase
+            // loadSubmissions()
+            chat_submissions.loadSubmissions(clashData.id)
+            chat_submissions.subscribeToClash(clashData.id)
+
+            /* supabase
                 .from('ClashVideo')
                 .on('*', async (payload) => {
                     console.log(payload);
@@ -67,23 +73,25 @@
                             videoData,
                             youtubeId: id
                         })
+
+                        chat_submissions.update(n=>submissions)
                     }
                     if (payload.eventType === 'DELETE') {
                         submissions = submissions.filter(
                             (submission) => submission.id !== payload.old.id
                         )
+                        chat_submissions.update(n=>submissions)
                     }
                     if(payload.eventType === 'UPDATE'){
-/* 
-    doesnt update the view... why tho?
-*/
+
                         let submission = submissions.find((element)=>{  return element.id === payload.old.id;  })
                         submission.approval = payload.new.approval;
                         console.log(submissions);
+                        chat_submissions.update(n=>submissions)
                         // console.log(test);
                     }
                 })
-                .subscribe()
+                .subscribe() */
             loading = false
         })
 
@@ -102,7 +110,7 @@
             clashData = data
         }
     }
-    async function loadSubmissions() {
+/*     async function loadSubmissions() {
         let { error, data } = await supabase
             .from('ClashVideo')
             .select('*')
@@ -125,7 +133,7 @@
                 }
             })
         )
-    }
+    } */
     async function deleteSubmission(submission) {
         let { error, data } = await supabase
             .from('ClashVideo')
@@ -137,11 +145,13 @@
         }
     }
 
-    async function  apporveSubmission(submission){
+    async function  updateApporveStatusOfSubmission(submission, approvalStatusCode){
+
+        if(approvalStatusCode === undefined || approvalStatusCode === null) return;
 
         let { error, data } = await supabase
             .from('ClashVideo')
-            .update({approval: 1})
+            .update({approval: approvalStatusCode})
             .eq('id', submission.id)
         if (error) {
             errorText = error.message
@@ -151,12 +161,13 @@
 </script>
 <h4>Moderator Overview</h4>
 <div
-    class="card border-primary mb-3 mt-5 overflow-auto"
+    class="card border-primary mb-3 mt-1 overflow-auto"
     style="height: 80vmin;"
 >
     <div class="card-body h-100">
         <h4 class="card-title">
-            Submissions ({submissions.length}/{clashData.video_count})
+            <!-- Submissions ({submissions.length}/{clashData.video_count}) -->
+            Submissions ({$chat_submissions.length}/{clashData.video_count})
         </h4>
         <p class="card-text">below you can see all the submissions</p>
         <table class="table table-hover h-100 mt-3">
@@ -170,7 +181,8 @@
                 </tr>
             </thead>
             <tbody>
-                {#each submissions as submission, i}
+                <!-- {#each submissions as submission, i} -->
+                {#each $chat_submissions as submission, i}
                     <tr>
                         <td>{i + 1}</td>
                         <td>
@@ -190,11 +202,9 @@
                                 {submission.videoData.snippet.title}
                                 <br/>
                                 <h4>
-                                    <span class="badge rounded-pill {submission.approval ? 'bg-success' : 'bg-danger'} ">{approvalTexts[submission.approval]}</span>
+                                    <span class="badge rounded-pill {submission.approval === 0 ? 'bg-danger' : submission.approval === 1 ? 'bg-success' : 'bg-warning'  } ">{approvalTexts[submission.approval]}</span>
                                 </h4>
-                                
-                            </div>    
-                        
+                            </div>
                         </td>
                         <td>
                             {submission.name}
@@ -207,14 +217,35 @@
                                 on:click={() => {deleteSubmission(submission)}}>
                                     Remove
                                 </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-success"
-                                    disabled={submission.approval}
-                                    on:click={()=>{apporveSubmission(submission)}}
-                                >
-                                    Approve
-                                </button>
+
+                                {#if submission.approval === 0}
+                                    <button
+                                        type="button"
+                                        class="btn btn-success"
+                                        disabled={submission.approval}
+                                        on:click={()=>{updateApporveStatusOfSubmission(submission,approvalState.APPROVED )}}
+                                    >
+                                        Approve
+                                    </button>
+                                {:else if submission.approval === 1}
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning"
+                                        on:click={()=>{updateApporveStatusOfSubmission(submission, approvalState.DISAPROVE )}}
+                                    >
+                                        Disapprove
+                                    </button>
+                                    
+                                {:else if submission.approval === 2}
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning"
+                                        on:click={()=>{updateApporveStatusOfSubmission(submission, approvalState.APPROVED )}}
+                                    >
+                                        Approve again
+                                    </button>
+                                    
+                                {/if}
 
                             </div>
                         </td>

@@ -2,6 +2,7 @@
     import supabase from '../../supabase'
     import { onMount } from 'svelte'
     import { validateLink } from '../../utils'
+    import { user } from '../../store'
     export let params = {}
     let clashData = {}
     let errorText = ''
@@ -19,6 +20,12 @@
     $: submittedCount >= clashData.video_count && !submitted
         ? (errorText = 'Clash is full!')
         : (errorText = '')
+
+
+    if($user){
+        formData.name = $user.user_metadata.nickname
+    }
+    
     onMount(() => {
         supabase
             .from('Clash')

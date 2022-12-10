@@ -1,5 +1,6 @@
 <script>
     import { user } from '../store'
+
 </script>
 
 {#if $user}

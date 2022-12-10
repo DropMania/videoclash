@@ -71,6 +71,11 @@
                             (submission) => submission.id !== payload.old.id
                         )
                     }
+                    if(payload.eventType === 'UPDATE'){
+                        let submission = submissions.find((element)=>{  return element.id === payload.old.id;  })
+                            submission.approval = payload.new.approval;
+                        submissions = submissions /* stupid but works to refresh the store :DDD */
+                    }
                 })
                 .subscribe()
             loading = false
