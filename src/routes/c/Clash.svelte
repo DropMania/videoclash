@@ -325,6 +325,11 @@
             `Submit your video here: ${location.origin}/#/c/submit/${clashData.id}`
         )
     }
+
+    function copyLinkToClipboard(){
+        navigator.clipboard.writeText(`${location.origin}/#/mod/${clashData.id}/supersecretcodehere`);
+        alert('Moderator-Link wurde in den Zwischenspeicher gespeichert!\nTeile den Link nur mit deinen Moderatoren');
+    }
 </script>
 
 {#if loading}
@@ -351,6 +356,7 @@
     </h1>
 
     {#if gameState.state == stateEnums.NOT_STARTED}
+    <div class="d-flex  gap-5">
         <button
             class="btn btn-primary my-3"
             on:click={() => (editWindow = true)}
@@ -368,8 +374,12 @@
                     fill-rule="evenodd"
                     d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
                 />
-            </svg></button
-        >
+            </svg></button>
+            <button class="btn btn-primary my-3" on:click={copyLinkToClipboard}>
+                Mod-Link
+                <span class="fa fa-eye-slash"/> 
+            </button>
+        </div>
         <Submissions
             {submissions}
             {clashData}
@@ -393,3 +403,10 @@
     {/if}
     <Edit bind:open={editWindow} {clashData} {loadClash} />
 {/if}
+
+
+<style>
+
+
+
+</style>

@@ -5,6 +5,7 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 ## Roadmap
 
 -   Moderator page / features
+    -   [UserModsIn-API-MrBartagam](https://modlookup.3v.fi/api/user-v3/mrbartagam) 
 -   Pay to Win (Buy more votes with subs/bits)
 -   submits extra options?
     -   Comments to submit (optional) max 256 lenght
@@ -20,13 +21,19 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   Spotify
 -   TikTok integration [Docs - Embeded vids](https://developers.tiktok.com/doc/embed-videos/)
 -   Spotify integration
+-   Twitch-Clip integration
 
 
 # Game Modes
 ## Idea
-- ?Royal Rumble?
-    - all v. all
-    - chat can spam? multivote? for favourite
+-  Group battle
+    -   streamer legt teams fest min.3 Chatter per Gruppe
+    -   Gruppen untereinander submitten Video-Vorschläge und wählen das beste der Gruppe aus
+        -   Voten für das beste Video der Gruppe
+            -   man kann nicht für das eigene Video voten
+        -   Guppenchat per Supabase?
+    -   Gruppen tretten danach gegeneinader mit ihren Videos an
+    -   das bessere Video wrid vom Chat gevoted
 
 ## Tournament
 

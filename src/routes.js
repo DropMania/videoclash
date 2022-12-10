@@ -6,6 +6,7 @@ import CreateB from './routes/b/Create.svelte'
 import GameB from './routes/b/Game.svelte'
 import TOS from './routes/TOS.svelte'
 import _404 from './routes/404.svelte'
+import ModeratorView from './routes/mod/ModeratorView.svelte'
 export default {
     '/': Home,
     '/c/create': Create,
@@ -14,5 +15,6 @@ export default {
     '/b/create': CreateB,
     '/tos': TOS,
     '/b/game/:id': GameB,
+    '/mod/:id/:secret':ModeratorView,
     '*': _404
 }
