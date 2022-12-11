@@ -78,7 +78,6 @@ export async function getTwitchToken() {
 export async function copyLinkToClipboard(textToClipboard="", alertMsg=""){
     if(textToClipboard !== ""){
         navigator.clipboard.writeText(textToClipboard);
-
         if(alertMsg !== ""){
             alert(alertMsg);
         }

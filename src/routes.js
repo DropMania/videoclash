@@ -8,6 +8,7 @@ import TOS from './routes/TOS.svelte'
 import _404 from './routes/404.svelte'
 import ModeratorView from './routes/mod/ModeratorView.svelte'
 import ManageModerators from './routes/mod/ManageModerators.svelte'
+import ModeratorInvitePage from './routes/mod/ModeratorInvitePage.svelte'
 export default {
     '/': Home,
     '/c/create': Create,
@@ -18,5 +19,6 @@ export default {
     '/b/game/:id': GameB,
     '/mod/clash/:id':ModeratorView,
     '/mod/manage':ManageModerators,
+    '/mod/invite/:token':ModeratorInvitePage,
     '*': _404
 }

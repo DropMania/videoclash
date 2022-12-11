@@ -3,7 +3,8 @@
     import { user } from "../../store.js";
     import { push } from "svelte-spa-router";
     import { onMount } from "svelte";
-    import { copyLinkToClipboard } from "../../utils.js";
+    import { copyLinkToClipboard, shortid } from "../../utils.js";
+    import keys from "../../keys.js";
 
     let moderatorStates = {
         DISABLED:false,
@@ -38,6 +39,7 @@
             .from('moderator_invite_tokens')
             .select('*')
             .eq('streamer_id', $user.id)
+            .order('created_at', { ascending: false })
         if (error) {
             errorText = 'Something went wrong! '
         } else {
@@ -45,13 +47,14 @@
         }
     }
 
-    function copyModeratorLinkToClipBoard(){
-        /* todo
-            check if an invite link already exists
-            YES -> delete old invite link
-
-            create new invite link
-        */
+    function copyModeratorLinkToClipBoard(token,token_status,expire_date){
+        let alertText = "Invite-link copied to clipboard. \nOnly share this link only with moderators you want to invite";
+        if(token !== "" && token_status && isDateInFuture(expire_date) ){
+            let url = `${keys.appBaseUrl}/#/mod/invite/${token}`;
+                copyLinkToClipboard(url,alertText)
+        }else{
+            alert("Cannot copy invite-link to clipboard")
+        }
     }
 
     async function updateModeratorStatus(modData, bStatus=false){
@@ -68,6 +71,23 @@
         }
 
         /* reload moderator list */
+    }
+
+    async function generateNewInviteToken(){
+        let { data, error } = await supabase
+            .from('moderator_invite_tokens')
+            .insert({
+                streamer_id: $user.id,
+                token: shortid(20)
+            })
+            .select('*')
+        if (error) {
+            errorText = 'Token could not be generated'
+        } else {
+            console.log(data);
+            loadInviteTokens();
+        }
+
     }
 
     function date_format(sDate=""){
@@ -170,6 +190,7 @@
             <button
                 type="button"
                 class="btn btn-success text-black rounded"
+                on:click={generateNewInviteToken}
             >new Token</button>
         </div>
         <table class="table table-hover  mt-3">
@@ -188,7 +209,9 @@
                                 <button class="btn rounded-circle text-white border border-white">
                                     <span class="fa fa-times"></span>
                                 </button>
-                                <button class="btn rounded-circle ml-3 text-white border border-white ">
+                                <button class="btn rounded-circle ml-3 text-white border border-white "
+                                    on:click={()=>{copyModeratorLinkToClipBoard(token.token, token.active, token.expire_date) }}
+                                >
                                     <span class="fa fa-clipboard"></span>
                                 </button>
                             </div>
