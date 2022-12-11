@@ -1,17 +1,12 @@
 <script>
-    import { createEventDispatcher } from 'svelte'
     import { onMount } from "svelte";
     import supabase from '../../supabase';
-    import { getVideoData, validateLink, getTwitchToken } from '../../utils'
-    import keys from '../../keys'
-    import { element } from 'svelte/internal';
     import { chat_submissions } from '../../store.js';
     export let params = {};
 
     let clashData = {}
     let errorText = ''
     let loading = true
-    var submissions = []
     let stateEnums = {
         NOT_STARTED: 1,
         SHOW_START: 2,
@@ -48,50 +43,8 @@
     onMount(()=>{
 
         loadClash().then(() => {
-            // loadSubmissions()
             chat_submissions.loadSubmissions(clashData.id)
             chat_submissions.subscribeToClash(clashData.id)
-
-            /* supabase
-                .from('ClashVideo')
-                .on('*', async (payload) => {
-                    console.log(payload);
-                    if (payload.eventType === 'INSERT') {
-                        if (payload.new.clash_id !== clashData.id) return
-                        let id = ''
-                        if (payload.new.link.includes('youtu.be')) {
-                            id = payload.new.link.split('youtu.be/')[1]
-                        } else {
-                            let params = new URLSearchParams(
-                                new URL(payload.new.link).search
-                            )
-                            id = params.get('v')
-                        }
-                        let videoData = await getVideoData(id)
-                        submissions = submissions.concat({
-                            ...payload.new,
-                            videoData,
-                            youtubeId: id
-                        })
-
-                        chat_submissions.update(n=>submissions)
-                    }
-                    if (payload.eventType === 'DELETE') {
-                        submissions = submissions.filter(
-                            (submission) => submission.id !== payload.old.id
-                        )
-                        chat_submissions.update(n=>submissions)
-                    }
-                    if(payload.eventType === 'UPDATE'){
-
-                        let submission = submissions.find((element)=>{  return element.id === payload.old.id;  })
-                        submission.approval = payload.new.approval;
-                        console.log(submissions);
-                        chat_submissions.update(n=>submissions)
-                        // console.log(test);
-                    }
-                })
-                .subscribe() */
             loading = false
         })
 
@@ -103,6 +56,7 @@
             .from('Clash')
             .select('*')
             .eq('id', params.id)
+            .eq('mod_secret_token', params.secret)
             .single()
         if (error) {
             errorText = 'Clash does not exist!'
@@ -110,30 +64,7 @@
             clashData = data
         }
     }
-/*     async function loadSubmissions() {
-        let { error, data } = await supabase
-            .from('ClashVideo')
-            .select('*')
-            .eq('clash_id', clashData.id)
 
-        submissions = await Promise.all(
-            data.map(async (d) => {
-                let id = ''
-                if (d.link.includes('youtu.be')) {
-                    id = d.link.split('youtu.be/')[1]
-                } else {
-                    let params = new URLSearchParams(new URL(d.link).search)
-                    id = params.get('v')
-                }
-                let videoData = await getVideoData(id)
-                return {
-                    ...d,
-                    videoData,
-                    youtubeId: id
-                }
-            })
-        )
-    } */
     async function deleteSubmission(submission) {
         let { error, data } = await supabase
             .from('ClashVideo')
@@ -167,7 +98,7 @@
     <div class="card-body h-100">
         <h4 class="card-title">
             <!-- Submissions ({submissions.length}/{clashData.video_count}) -->
-            Submissions ({$chat_submissions.length}/{clashData.video_count})
+            Submissions ({$chat_submissions.length}/{clashData.video_count ? clashData.video_count : 0 })
         </h4>
         <p class="card-text">below you can see all the submissions</p>
         <table class="table table-hover h-100 mt-3">
@@ -200,8 +131,7 @@
                         <td>
                             <div>
                                 {submission.videoData.snippet.title}
-                                <br/>
-                                <h4>
+                                <h4 class="mt-3">
                                     <span class="badge rounded-pill {submission.approval === 0 ? 'bg-danger' : submission.approval === 1 ? 'bg-success' : 'bg-warning'  } ">{approvalTexts[submission.approval]}</span>
                                 </h4>
                             </div>
@@ -210,10 +140,12 @@
                             {submission.name}
                         </td>
                         <td>
-                            <div>
+                            <div class="">
+                                <!-- moderator cannot delete because they are not the ones that created the clash :/ -->
                                 <button
                                 type="button"
-                                class="btn btn-danger"
+                                class="btn btn-danger w-100"
+                                disabled
                                 on:click={() => {deleteSubmission(submission)}}>
                                     Remove
                                 </button>
@@ -221,7 +153,7 @@
                                 {#if submission.approval === 0}
                                     <button
                                         type="button"
-                                        class="btn btn-success"
+                                        class="btn btn-success w-100 mt-3 approvalBtn"
                                         disabled={submission.approval}
                                         on:click={()=>{updateApporveStatusOfSubmission(submission,approvalState.APPROVED )}}
                                     >
@@ -230,7 +162,7 @@
                                 {:else if submission.approval === 1}
                                     <button
                                         type="button"
-                                        class="btn btn-warning"
+                                        class="btn btn-warning w-100 mt-3 approvalBtn"
                                         on:click={()=>{updateApporveStatusOfSubmission(submission, approvalState.DISAPROVE )}}
                                     >
                                         Disapprove
@@ -239,7 +171,7 @@
                                 {:else if submission.approval === 2}
                                     <button
                                         type="button"
-                                        class="btn btn-warning"
+                                        class="btn btn-warning w-100 mt-3 approvalBtn"
                                         on:click={()=>{updateApporveStatusOfSubmission(submission, approvalState.APPROVED )}}
                                     >
                                         Approve again
@@ -255,3 +187,10 @@
         </table>
     </div>
 </div>
+
+
+<style>
+    .approvalBtn {
+        min-width: 130px;
+    }
+</style>

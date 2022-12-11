@@ -36,7 +36,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky">
     <div class="container-fluid">
         <a class="navbar-brand" href="/#/">VideoClash</a>
-
+        
         {#if $user}
             <h4>
                 Hello, {$user.user_metadata.nickname}
@@ -48,10 +48,14 @@
                     alt="avatar"
                 />
             </h4>
-            <div class="btn btn-secondary my-2 my-sm-0" on:click={signout}>
-                Logout
+            <div>
+                <a class="btn btn-secondary " href="/#/mod/manage">Moderator</a>
+                <div class="btn btn-secondary my-2 my-sm-0" on:click={signout}>
+                    Logout
+                </div>
             </div>
         {:else}
+            
             <button
                 class="btn btn-secondary my-2 my-sm-0"
                 on:click={signInWithTwitch}>Login with Twitch</button
