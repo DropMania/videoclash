@@ -3,10 +3,11 @@
     import { user } from "../../store.js";
     import { push } from "svelte-spa-router";
     import { onMount } from "svelte";
+    import { copyLinkToClipboard } from "../../utils.js";
 
     let moderatorStates = {
-        DISABLED:0,
-        ACTIVE:1
+        DISABLED:false,
+        ACTIVE:true
     },
     moderatorStateTexts = [
         'Disabled',
@@ -17,18 +18,30 @@
 
     let error="",
         errorText="",
-        moderators = [];
+        moderators = [],
+        invite_tokens = [];
 
 
     async function loadModerators() {
         let { data, error } = await supabase
             .from('moderator_to_streamer')
             .select('*')
+            .eq('streamer_id', $user.id)
         if (error) {
             errorText = 'Something went wrong! '
         } else {
-            console.log(data);
             moderators = data
+        }
+    }
+    async function loadInviteTokens() {
+        let { data, error } = await supabase
+            .from('moderator_invite_tokens')
+            .select('*')
+            .eq('streamer_id', $user.id)
+        if (error) {
+            errorText = 'Something went wrong! '
+        } else {
+            invite_tokens = data
         }
     }
 
@@ -41,11 +54,28 @@
         */
     }
 
-    function updateModeratorStatus(modData, statusCode){
+    async function updateModeratorStatus(modData, bStatus=false){
         /* update moderator status active/disabled */
-
+        let { data, error } = await supabase
+            .from('moderator_to_streamer')
+            .update({active:bStatus})
+            .eq('streamer_id', $user.id)
+            .eq('moderator_id', modData.moderator_id)
+        if (error) {
+            errorText = 'Something went wrong! '
+        } else {
+            loadModerators()
+        }
 
         /* reload moderator list */
+    }
+
+    function date_format(sDate=""){
+        return new Date(sDate).toLocaleString();
+    }
+
+    function isDateInFuture(sDate=""){
+        return new Date(sDate) > new Date();
     }
 
 
@@ -56,19 +86,17 @@
             push('/')
         }
 
-        loadModerators()
+        loadModerators();
+        loadInviteTokens();
     });
 
 </script>
 
     <h4>Manage your Moderators here</h4>
-    <div class="d-flex">
-        <h3>To add moderators send the invite linkt after pressing on this button ==></h3>
-        <button class="btn btn-primary"
-            on:click={copyModeratorLinkToClipBoard}>
-            Add Moderator
-        </button>
-    </div>
+    {#if errorText !== ""}
+        {errorText}
+    {/if}
+<div class="d-flex">
     <div class="card border-primary mb-3 mt-1 overflow-auto"
         style="height: 80vmin; width: 80vmin;">
 
@@ -88,7 +116,6 @@
                         <td>{i+1}</td>
                         <td>
                             {#if mod.profile_data}
-                                
                                 <img
                                     style="border-radius: 0.25rem;"
                                     width="32"
@@ -100,7 +127,9 @@
                                 <span>IMG-missing</span>
                             {/if}
                         </td>
-                        <td>{mod.moderator_id}</td>
+                        <td>
+                            {mod.profile_data.nickname}
+                        </td>
                         <td>
                             <h4>
                                 <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'  } "> {mod.active ? 'Activ' : 'Disabled'  }  </span>
@@ -111,7 +140,7 @@
                                 <button
                                     type="button"
                                     class="btn btn-danger w-100"
-                                    on:click={()=>{updateModeratorStatus(mod, moderatorStates.DISABLED )}}
+                                    on:click={()=>{updateModeratorStatus(mod, false )}}
                                 >
                                     Disable
                                 </button>
@@ -119,7 +148,7 @@
                                 <button
                                     type="button"
                                     class="btn btn-warning w-100"
-                                    on:click={()=>{updateModeratorStatus(mod, moderatorStates.ACTIVE )}}
+                                    on:click={()=>{updateModeratorStatus(mod, true )}}
                                 >
                                     Reactivate
                                 </button>
@@ -134,3 +163,45 @@
         </table>
 
     </div>
+    <div class="card border-primary mb-3 mt-1 overflow-auto"
+    style="height: 80vmin; width: 30vmin;">
+        Invite Tokens:
+        <div>
+            <button
+                type="button"
+                class="btn btn-success text-black rounded"
+            >new Token</button>
+        </div>
+        <table class="table table-hover  mt-3">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Token</th>
+                    <th scope="col">Expire date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each invite_tokens as token}
+                    <tr class={token.active && isDateInFuture(token.expire_date) ? 'bg-primary' : 'bg-secondary'}>
+                        <td>
+                            <div class="d-flex">
+                                <button class="btn rounded-circle text-white border border-white">
+                                    <span class="fa fa-times"></span>
+                                </button>
+                                <button class="btn rounded-circle ml-3 text-white border border-white ">
+                                    <span class="fa fa-clipboard"></span>
+                                </button>
+                            </div>
+                        </td>
+                        <td>*****</td>
+                        <td>
+                            {date_format(token.expire_date)}
+                        </td>
+                        
+                    </tr>
+                {/each}
+                
+            </tbody>
+        </table>
+    </div>
+</div>

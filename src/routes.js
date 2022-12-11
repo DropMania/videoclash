@@ -16,7 +16,7 @@ export default {
     '/b/create': CreateB,
     '/tos': TOS,
     '/b/game/:id': GameB,
-    '/mod/:id/:secret':ModeratorView,
+    '/mod/clash/:id':ModeratorView,
     '/mod/manage':ManageModerators,
     '*': _404
 }

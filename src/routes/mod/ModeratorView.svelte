@@ -1,7 +1,8 @@
 <script>
     import { onMount } from "svelte";
+    import { push } from "svelte-spa-router";
     import supabase from '../../supabase';
-    import { chat_submissions } from '../../store.js';
+    import { chat_submissions, user } from '../../store.js';
     export let params = {};
 
     let clashData = {}
@@ -42,6 +43,11 @@
 
     onMount(()=>{
 
+        if(!$user){
+            console.log('in not loggedin');
+            push('/')
+        }
+
         loadClash().then(() => {
             chat_submissions.loadSubmissions(clashData.id)
             chat_submissions.subscribeToClash(clashData.id)
@@ -56,7 +62,6 @@
             .from('Clash')
             .select('*')
             .eq('id', params.id)
-            .eq('mod_secret_token', params.secret)
             .single()
         if (error) {
             errorText = 'Clash does not exist!'
@@ -145,7 +150,6 @@
                                 <button
                                 type="button"
                                 class="btn btn-danger w-100"
-                                disabled
                                 on:click={() => {deleteSubmission(submission)}}>
                                     Remove
                                 </button>

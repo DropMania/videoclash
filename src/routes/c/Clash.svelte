@@ -332,8 +332,7 @@
     }
 
     function copyLinkToClipboard(){
-        navigator.clipboard.writeText(`${location.origin}/#/mod/${clashData.id}/${clashData.mod_secret_token}`);
-        alert('Moderator-Link wurde in den Zwischenspeicher gespeichert!\nTeile den Link nur mit deinen Moderatoren');
+        navigator.clipboard.writeText(`${location.origin}/#/mod/clash/${clashData.id}`);
     }
 </script>
 

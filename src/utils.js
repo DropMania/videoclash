@@ -73,3 +73,15 @@ export async function getTwitchToken() {
     twitch_token.set(data.token)
     return 'oauth:' + data.token
 }
+
+
+export async function copyLinkToClipboard(textToClipboard="", alertMsg=""){
+    if(textToClipboard !== ""){
+        navigator.clipboard.writeText(textToClipboard);
+
+        if(alertMsg !== ""){
+            alert(alertMsg);
+        }
+    }
+    
+}

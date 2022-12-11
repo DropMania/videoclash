@@ -99,6 +99,11 @@
         invalidVideo = response
         videoData = vd
     }
+
+    function backToNextSubmission(){
+        formData.link = "";
+        submitted = false;
+    }
 </script>
 
 {#if loading}
@@ -180,5 +185,6 @@
         <div class="alert alert-dismissible alert-success mt-5">
             Your Video is submitted! You can close this window now.
         </div>
+        <button on:click={backToNextSubmission}>Back</button>
     {/if}
 {/if}

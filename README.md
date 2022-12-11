@@ -56,7 +56,9 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   per search on extra-page? display all registerd users , add/remove per Button click
 
 -   Overview of active or previews created Clashes on Home-Page (owned & moderation)
--   Contact-Page
+-   Contacts-Page
+    -   About us
+    -   contact us form
 -   Suggestions-Page
     -   Logged in users can make suggestions of improvments, new features or buggs
     -   max 50 suggestions at a time (spam protection)
