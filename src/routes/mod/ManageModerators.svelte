@@ -4,23 +4,16 @@
     import { push } from "svelte-spa-router";
     import { onMount } from "svelte";
     import { copyLinkToClipboard, shortid } from "../../utils.js";
-    import keys from "../../keys.js";
+    import { modStateTexts, modStates } from "../../enums/moderator.js";
 
-    let moderatorStates = {
-        DISABLED:false,
-        ACTIVE:true
-    },
-    moderatorStateTexts = [
-        'Disabled',
-        'Active'
-    ]
 
 
 
     let error="",
         errorText="",
         moderators = [],
-        invite_tokens = [];
+        invite_tokens = [],
+        clashes=[];
 
 
     async function loadModerators() {
@@ -46,11 +39,24 @@
             invite_tokens = data
         }
     }
+    async function loadClashes() {
+        let { data, error } = await supabase
+            .from('Clash')
+            .select('*')
+            .eq('created_by', $user.id)
+            .order('created_at', { ascending: false })
+        if (error) {
+            // errorText = 'Something went wrong! '
+            console.log('Cannt load Clashes');
+        } else {
+            clashes = data
+        }
+    }
 
     function copyModeratorLinkToClipBoard(token,token_status,expire_date){
         let alertText = "Invite-link copied to clipboard. \nOnly share this link only with moderators you want to invite";
         if(token !== "" && token_status && isDateInFuture(expire_date) ){
-            let url = `${keys.appBaseUrl}/#/mod/invite/${token}`;
+            let url = `${location.origin}/#/mod/invite/${token}`;
                 copyLinkToClipboard(url,alertText)
         }else{
             alert("Cannot copy invite-link to clipboard")
@@ -67,10 +73,24 @@
         if (error) {
             errorText = 'Something went wrong! '
         } else {
+            /* reload moderator list */
             loadModerators()
         }
+    }
 
-        /* reload moderator list */
+    async function removeModerator(mod){
+        console.log(mod);
+        let { data, error } = await supabase
+            .from('moderator_to_streamer')
+            .delete()
+            .eq('streamer_id', $user.id)
+            .eq('moderator_id', mod.moderator_id);
+        if (error) {
+            errorText = 'Something went wrong! '
+        } else {
+            /* reload moderator list */
+            loadModerators()
+        }
     }
 
     async function generateNewInviteToken(){
@@ -87,11 +107,37 @@
             console.log(data);
             loadInviteTokens();
         }
-
     }
 
-    function date_format(sDate=""){
-        return new Date(sDate).toLocaleString();
+    async function deleteInviteToken(sToken){
+        let { data, error } = await supabase
+            .from('moderator_invite_tokens')
+            .delete()
+            .eq('token',sToken)
+        if (error) {
+            errorText = 'Token could not be deleted'
+        } else {
+            loadInviteTokens();
+        }
+    }
+
+
+    function date_format(sDate="",scope="full"){
+        switch (scope) {
+            case 'full':
+                return new Date(sDate).toLocaleString();
+                break;
+            case 'date':
+                return new Date(sDate).toLocaleDateString();
+                break;
+            case 'time':
+                return new Date(sDate).toLocaleTimeString();
+                break;
+        
+            default:
+                break;
+        }
+        
     }
 
     function isDateInFuture(sDate=""){
@@ -107,6 +153,7 @@
         }
 
         loadModerators();
+        loadClashes()
         loadInviteTokens();
     });
 
@@ -118,13 +165,66 @@
     {/if}
 <div class="d-flex">
     <div class="card border-primary mb-3 mt-1 overflow-auto"
+        style="height: 80vmin; width: 40vmin;">
+        Previous/Running Clashes
+        <table class="table table-hover  mt-3">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Creator</th>
+                    <th scope="col">Topic</th>
+                    <th scope="col">Created on</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {#each clashes as clash, q}
+                    <tr>
+                        <td>
+                            {q+1}
+                        </td>
+                        <td>
+                            <img
+                                style="border-radius: 0.25rem;"
+                                width="32"
+                                height="32"
+                                src={$user.user_metadata.picture}
+                                alt="avatar"
+                            />
+                        </td>
+                        <td>{clash.topic}</td>
+                        <td>
+                            {date_format(clash.created_at,'date')}
+                        </td>
+                        <td>
+                            <button class="btn btn-primary rounded-circle " 
+                                on:click={()=>{ window.open(`${location.origin}/#/c/clash/${clash.id}`,'_blank' ) }}
+                            >
+                                C
+                            </button>
+                            <button class="btn btn-primary rounded-circle " 
+                                on:click={()=>{ window.open(`${location.origin}/#/mod/clash/${clash.id}`,'_blank' ) }}
+                            >
+                                M
+                            </button>
+                        </td>
+                        
+                    </tr>
+                {/each}
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="card border-primary mb-3 mt-1 overflow-auto"
         style="height: 80vmin; width: 80vmin;">
 
         <table class="table table-hover  mt-3">
             <thead>
                 <tr>
                     <th scope="col"></th>
-                    <th scope="col">Profile-Pic</th>
+                    <th scope="col"></th>
                     <th scope="col">Name</th>
                     <th scope="col">Status</th>
                     <th scope="col"></th>
@@ -133,7 +233,16 @@
             <tbody>
                 {#each moderators as mod, i}
                     <tr>
-                        <td>{i+1}</td>
+                        <td>
+                            <div>
+                                <button
+                                    class="btn btn-danger rounded-circle"
+                                    on:click={()=>{removeModerator(mod)}}
+                                >
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
                         <td>
                             {#if mod.profile_data}
                                 <img
@@ -152,7 +261,9 @@
                         </td>
                         <td>
                             <h4>
-                                <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'  } "> {mod.active ? 'Activ' : 'Disabled'  }  </span>
+                                <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'} ">
+                                    {mod.active ? modStateTexts[modStates.ACTIVE] : modStateTexts[modStates.DISABLED]}
+                                </span>
                             </h4>
                         </td>
                         <td>
@@ -206,7 +317,9 @@
                     <tr class={token.active && isDateInFuture(token.expire_date) ? 'bg-primary' : 'bg-secondary'}>
                         <td>
                             <div class="d-flex">
-                                <button class="btn rounded-circle text-white border border-white">
+                                <button class="btn rounded-circle text-white border border-white"
+                                    on:click={()=>{deleteInviteToken(token.token)}}
+                                >
                                     <span class="fa fa-times"></span>
                                 </button>
                                 <button class="btn rounded-circle ml-3 text-white border border-white "

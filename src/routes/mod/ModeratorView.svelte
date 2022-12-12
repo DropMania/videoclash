@@ -102,7 +102,6 @@
 >
     <div class="card-body h-100">
         <h4 class="card-title">
-            <!-- Submissions ({submissions.length}/{clashData.video_count}) -->
             Submissions ({$chat_submissions.length}/{clashData.video_count ? clashData.video_count : 0 })
         </h4>
         <p class="card-text">below you can see all the submissions</p>

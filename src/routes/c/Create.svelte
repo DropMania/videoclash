@@ -20,7 +20,6 @@
         loading = true
         const { data, error } = await supabase.from('Clash').insert({
             id: shortid(),
-            mod_secret_token: shortid(),
             created_by: $user.id,
             ...formData
         })
