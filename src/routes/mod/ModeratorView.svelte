@@ -145,7 +145,6 @@
                         </td>
                         <td>
                             <div class="">
-                                <!-- moderator cannot delete because they are not the ones that created the clash :/ -->
                                 <button
                                 type="button"
                                 class="btn btn-danger w-100"

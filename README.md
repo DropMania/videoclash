@@ -62,3 +62,50 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 -   Suggestions-Page
     -   Logged in users can make suggestions of improvments, new features or buggs
     -   max 50 suggestions at a time (spam protection)
+
+-   Tier-List 
+    -   Basic Tier List
+    -   Chat submitts a number of videos
+    -   Streamer ranks them in the tier-list
+
+-   Guess-my-Video 
+    -   Group/Collab 
+    -   PvP 
+    -   Spieler stellen Videos ein Dann wird jedes Video nacheinander gezeigt bei jedem Video muss der Chat voten von wem das Video ursprünglich kommt. Spieler bekommt Punkte berechnet aus wieviel Votes richtig gestimmt haben. Der Spieler mit den meisten Punkten gewinnt. 
+-   Topic-picked-for-you 
+    -   Thema wird von uns vorgegebne 
+    -   Rest wie Clash-System? 
+
+-   Descripe-the-video 
+    -   Gruppen/Collab 
+    -   Spieler vs Spieler 
+    -   Chat reicht Videos ein und die Spieler müssen das kurz beschreiben. Textform (nicht verbal). 
+        Zu jeden Video werden dann die Beschreibungen vorgelesen (Spieler selber oder TTS) Chat stimmt dann für die beste, witzigste oder passende Beschreibung ab. 
+        Punkte gibt es dann je nach Ranking pro Video Der die meisten Punkte hat gewinnt 
+    
+-   find-the-right-video 
+    -   Gruppen/Collab 
+    -   Spieler vs Spieler 
+    -   Es wird ein Thema vorgegeben von der Platform 
+    -   Spieler müssen passend zum Thema Videos/Clips/Shorts/TikToks raussuchen 
+    -   Chat Voted beste umsetzung des Themas 
+    -   Beachten: Thema sollte nicht zu konkret sein und Interpretationsfreiraum bieten 
+        -   ein paar Worte bis max einen Satz länge 
+        -   Beispiel: "Wenn man wieder Lost ist" => Video von Mitchi 
+    -   Nur kurze Videos zulassen 
+    
+-   Community-vs-Community-Clash 
+    -   Collab 
+    -   Community vs Community 
+    -   Chat reicht Videos für die eigene Community ein 
+    -   Jede Community voted für das beste Video der jeweiligen Community 
+    -   Danach tretten beide gewinner der jeweiligen Community gegeneinander an 
+    -   Chat aus beiden Communitys bestimmt gewinner 
+    -   Mögliche Probleme: 
+        -   balancing bei großer gegen kleiner Community 
+        -   vielleicht anstatt einzelnen Stimmen Prozentualler Anteil
+
+
+-   Twitch-Clip-Fiasko
+    -   vom Eingeloggten User werden random oder geziehlt Clips ausgewählt
+    -   Clash um den besten Clip zu bestimmen

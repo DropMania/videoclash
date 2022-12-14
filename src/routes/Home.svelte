@@ -1,13 +1,49 @@
 <script>
+    import { push } from 'svelte-spa-router';
     import Sidebar from '../lib/util/Sidebar.svelte';
     import { user } from '../store'
+    import supabase from '../supabase.js';
     
-    export let sidebar_show;
+    let gameIdSearchValue = "",
+        searchIsValid = true;
+
+
+
+    async function onSearchGameIdBtn(){
+        searchForGameId(gameIdSearchValue)
+    }
+    async function onKeyPressSearchGameId(e){
+        if(e.key !== 'Enter')return;
+        searchForGameId(gameIdSearchValue)
+    }
+
+    async function searchForGameId(game_id){
+        if(await isGameIdExsitsting(game_id)){
+            push(`/c/submit/${game_id}`)
+        }else{
+            searchIsValid = false
+        }
+    }
+
+    async function isGameIdExsitsting(game_id) {
+        let { data, error } = await supabase
+            .from('Clash')
+            .select('*')
+            .eq('id', game_id)
+        if (error) {
+            return false;
+        } else {
+            if(data.length > 0){
+                return true;
+            }else{
+                return false
+            }
+        }
+    }
 </script>
 
 {#if $user}
     <div class="d-flex flex-column">
-        <!-- <button on:click={()=>{ sidebar_show = !sidebar_show }} class="btn btn-secondary" >Sidebar</button> -->
         <h1>Choose a Gamemode!</h1>
         <a href="/#/c/create">
             <button type="button" class="btn btn-secondary btn-lg mt-5">
@@ -24,3 +60,4 @@
 {:else}
     You need to log in to create a clash!
 {/if}
+

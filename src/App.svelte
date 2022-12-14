@@ -49,6 +49,7 @@
                 />
             </h4>
             <div>
+
                 <a class="btn btn-secondary " href="/#/mod/manage">Moderators</a>
                 <div class="btn btn-secondary my-2 my-sm-0" on:click={signout}>
                     Logout

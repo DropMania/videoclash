@@ -40,13 +40,15 @@
         }
     }
     async function loadClashes() {
-        let { data, error } = await supabase
+        /* let { data, error } = await supabase
             .from('Clash')
             .select('*')
             .eq('created_by', $user.id)
-            .order('created_at', { ascending: false })
+            .order('created_at', { ascending: false }) */
+
+        const { data, error } = await supabase.rpc('get_all_moderatable_clashes_for_user')
+
         if (error) {
-            // errorText = 'Something went wrong! '
             console.log('Cannt load Clashes');
         } else {
             clashes = data
@@ -164,57 +166,73 @@
         {errorText}
     {/if}
 <div class="d-flex">
-    <div class="card border-primary mb-3 mt-1 overflow-auto"
+    <div class="card border-primary mb-3 mt-1 overflow-hidden"
         style="height: 80vmin; width: 40vmin;">
-        Previous/Running Clashes
-        <table class="table table-hover  mt-3">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Creator</th>
-                    <th scope="col">Topic</th>
-                    <th scope="col">Created on</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="d-flex p-1">
+            <button class="btn btn-secondary ml-3"
+                type="button"
+                on:click={loadClashes}
+            >
+                <span class="fa fa-refresh"></span>
+            </button>
+            <div class="text-center  w-100">Previous/Running Clashes</div>
+        </div>
+        <div class="overflow-auto h-100">
 
-                {#each clashes as clash, q}
+            <table class="table table-hover  mt-3">
+                <thead>
                     <tr>
-                        <td>
-                            {q+1}
-                        </td>
-                        <td>
-                            <img
-                                style="border-radius: 0.25rem;"
-                                width="32"
-                                height="32"
-                                src={$user.user_metadata.picture}
-                                alt="avatar"
-                            />
-                        </td>
-                        <td>{clash.topic}</td>
-                        <td>
-                            {date_format(clash.created_at,'date')}
-                        </td>
-                        <td>
-                            <button class="btn btn-primary rounded-circle " 
-                                on:click={()=>{ window.open(`${location.origin}/#/c/clash/${clash.id}`,'_blank' ) }}
-                            >
-                                C
-                            </button>
-                            <button class="btn btn-primary rounded-circle " 
-                                on:click={()=>{ window.open(`${location.origin}/#/mod/clash/${clash.id}`,'_blank' ) }}
-                            >
-                                M
-                            </button>
-                        </td>
-                        
+                        <th scope="col">Creator</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col">Created on</th>
+                        <th scope="col"></th>
                     </tr>
-                {/each}
-            </tbody>
-
-        </table>
+                </thead>
+                <tbody>
+    
+                    {#each clashes as clash, q}
+                        <tr>
+                            <td>
+                                <img
+                                    style="border-radius: 0.25rem;"
+                                    width="32"
+                                    height="32"
+                                    src={clash.avatar_url}
+                                    alt={clash.nickname}
+                                    title={clash.nickname}
+                                />
+                            </td>
+                            <td>
+                                <div class="text-truncate">
+                                    {clash.topic}
+                                </div>
+                            </td>
+                            <td>
+                                {date_format(clash.created_at,'date')}
+                            </td>
+                            <td>
+                                <div>
+                                    <button class="btn btn-secondary"
+                                    style="width: 36px;height:36px"
+                                        on:click={()=>{ window.open(`${location.origin}/#/c/clash/${clash.id}`,'_blank' ) }}
+                                    >
+                                        C
+                                    </button>
+                                    <button class="btn btn-primary" 
+                                        style="width: 36px;height:36px"
+                                        on:click={()=>{ window.open(`${location.origin}/#/mod/clash/${clash.id}`,'_blank' ) }}
+                                    >
+                                        M
+                                    </button>
+                                </div>
+                            </td>
+                            
+                        </tr>
+                    {/each}
+                </tbody>
+    
+            </table>
+        </div>
     </div>
 
     <div class="card border-primary mb-3 mt-1 overflow-auto"
@@ -281,7 +299,7 @@
                                     class="btn btn-warning w-100"
                                     on:click={()=>{updateModeratorStatus(mod, true )}}
                                 >
-                                    Reactivate
+                                    Activate
                                 </button>
 
                             {/if}

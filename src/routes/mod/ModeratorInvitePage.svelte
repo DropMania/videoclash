@@ -60,10 +60,7 @@
 
 </script>
 
-
-
 <div>
-
     {#if $user}
         <h2>
             You have been invited to join as a Moderator
