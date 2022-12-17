@@ -5,7 +5,8 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 ## Roadmap
 
 -   Moderator page / features
-    -   [UserModsIn-API-MrBartagam](https://modlookup.3v.fi/api/user-v3/mrbartagam) 
+    -  [~~UserModsIn-API-MrBartagam~~](https://modlookup.3v.fi/api/user-v3/ mrbartagam)
+        -   API will be broken starting Feburary 2023 so we dont use it
 -   Pay to Win (Buy more votes with subs/bits)
 -   submits extra options?
     -   Comments to submit (optional) max 256 lenght
@@ -26,15 +27,70 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 
 
 # Game Modes
-## Idea
+## Idea - (concepts only)
 -  Group battle
-    -   streamer legt teams fest min.3 Chatter per Gruppe
-    -   Gruppen untereinander submitten Video-Vorschläge und wählen das beste der Gruppe aus
-        -   Voten für das beste Video der Gruppe
-            -   man kann nicht für das eigene Video voten
-        -   Guppenchat per Supabase?
-    -   Gruppen tretten danach gegeneinader mit ihren Videos an
-    -   das bessere Video wrid vom Chat gevoted
+    -   streamer create teams of min.2 chatters per group
+    -   groups submitt videos to group and vote for their groups best
+        -   vote for the best video of the group
+            -   you cannot vote for your own video
+        -   group-chat per supabase?
+    -   group clash afterwards with each other with their best video
+    -   best video gets voted by chat
+-   Tier-List 
+    -   singelplayer
+    -   basic tier List
+    -   chat submitts a number of videos
+    -   streamer ranks them in the tier-list
+
+-   Guess-my-Video 
+    -   Group/Collab 
+    -   PvP 
+    -   Spieler stellen Videos ein Dann wird jedes Video nacheinander gezeigt bei jedem Video muss der Chat voten von wem das Video ursprünglich kommt. Spieler bekommt Punkte berechnet aus wieviel Votes richtig gestimmt haben. Der Spieler mit den meisten Punkten gewinnt. 
+    -   chatter submit videos
+    -   videos will be shown after each other
+        -   chat votes who originaly submitted the video
+    -   score will be calculated based on right answers
+    -   chatter with most point wins the game
+    
+-   Topic-picked-for-you  
+    -   theme will be pickt for you
+    -   after that same as normal clash?
+    -   TO-DO: formulate further
+
+-   Descripe-the-video 
+    -   PvP
+    -   Chat reicht Videos ein und die Spieler müssen das kurz beschreiben. Textform (nicht verbal). 
+    -   chatters submitt videos
+    -   players have to descripe the video (not verbally)
+    -   player or TTS read out the description
+    -   chat votes for best, funniest or most fitting description
+    -   points will be given out based on voting
+    -   most point win
+    
+-   find-the-right-video 
+    -   group/collab 
+    -   PvP
+    -   the topic will be provided
+    -   player have to find and submitt fitting videos/clips/yt-shorts/tiktoks
+    -   NOTE: topic should not be to concrete and should have leeway of interpretation
+        -   one word or max one sentance
+        -   e.g. "someone that is lost" => video of Mitchi
+        -   only short videos
+    
+-   Community-vs-Community-Clash 
+    -   collab 
+    -   community vs community 
+    -   chat submitts videos for their community
+    -   every community votes for their communitys best video
+    -   afterwards winner videos of both communities clash with each other
+    -   chat votes for the winner
+    -   possible problems:
+        -   balancing with larger communities vs smaller communities
+        -   possible way: percentage of votes of both chats?
+
+-   Twitch-Clip-Fiasko
+    -   random clips or pickt out clips from the players Twitch-channel will be choosen
+    -   clash for the best clip 
 
 ## Tournament
 
@@ -47,15 +103,14 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 -   Let people vote from 1 - 5 how good the song is
 -   Show statistics of every song compared
 
-
-
-## General Ideas
--   streamer can add moderators
-    -   per invite link (copy-url and send it to moderator)?
+# General Ideas
+-   streamer can add moderators :white_check_mark:
+    -   per invite link (copy-url and send it to moderator) - :white_check_mark:
         -   url includes token that is connected to streamer
-    -   per search on extra-page? display all registerd users , add/remove per Button click
+    -   per search on extra-page? display all registerd users , 
+    -   add/remove per Button click :white_check_mark:
 
--   Overview of active or previews created Clashes on Home-Page (owned & moderation)
+-   Overview of active or previews created Clashes on ~~Home-Page~~ moderator-page (owned & moderation) :white_check_mark:
 -   Contacts-Page
     -   About us
     -   contact us form
@@ -63,49 +118,4 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   Logged in users can make suggestions of improvments, new features or buggs
     -   max 50 suggestions at a time (spam protection)
 
--   Tier-List 
-    -   Basic Tier List
-    -   Chat submitts a number of videos
-    -   Streamer ranks them in the tier-list
 
--   Guess-my-Video 
-    -   Group/Collab 
-    -   PvP 
-    -   Spieler stellen Videos ein Dann wird jedes Video nacheinander gezeigt bei jedem Video muss der Chat voten von wem das Video ursprünglich kommt. Spieler bekommt Punkte berechnet aus wieviel Votes richtig gestimmt haben. Der Spieler mit den meisten Punkten gewinnt. 
--   Topic-picked-for-you 
-    -   Thema wird von uns vorgegebne 
-    -   Rest wie Clash-System? 
-
--   Descripe-the-video 
-    -   Gruppen/Collab 
-    -   Spieler vs Spieler 
-    -   Chat reicht Videos ein und die Spieler müssen das kurz beschreiben. Textform (nicht verbal). 
-        Zu jeden Video werden dann die Beschreibungen vorgelesen (Spieler selber oder TTS) Chat stimmt dann für die beste, witzigste oder passende Beschreibung ab. 
-        Punkte gibt es dann je nach Ranking pro Video Der die meisten Punkte hat gewinnt 
-    
--   find-the-right-video 
-    -   Gruppen/Collab 
-    -   Spieler vs Spieler 
-    -   Es wird ein Thema vorgegeben von der Platform 
-    -   Spieler müssen passend zum Thema Videos/Clips/Shorts/TikToks raussuchen 
-    -   Chat Voted beste umsetzung des Themas 
-    -   Beachten: Thema sollte nicht zu konkret sein und Interpretationsfreiraum bieten 
-        -   ein paar Worte bis max einen Satz länge 
-        -   Beispiel: "Wenn man wieder Lost ist" => Video von Mitchi 
-    -   Nur kurze Videos zulassen 
-    
--   Community-vs-Community-Clash 
-    -   Collab 
-    -   Community vs Community 
-    -   Chat reicht Videos für die eigene Community ein 
-    -   Jede Community voted für das beste Video der jeweiligen Community 
-    -   Danach tretten beide gewinner der jeweiligen Community gegeneinander an 
-    -   Chat aus beiden Communitys bestimmt gewinner 
-    -   Mögliche Probleme: 
-        -   balancing bei großer gegen kleiner Community 
-        -   vielleicht anstatt einzelnen Stimmen Prozentualler Anteil
-
-
--   Twitch-Clip-Fiasko
-    -   vom Eingeloggten User werden random oder geziehlt Clips ausgewählt
-    -   Clash um den besten Clip zu bestimmen

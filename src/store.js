@@ -8,19 +8,12 @@ export let twitch_token = writable(null)
 function createChatSubmissionsStore(){
     const { subscribe, set, update } = writable([]);
 
-    const loadSubmissions = async function(clash_id="",mod_secret_token=""){
-        /* let { error, data } = await supabase
-            .from('ClashVideo')
-            .select('*')
-            .eq('clash_id', clash_id) */
-        
+    const loadSubmissions = async function(clash_id=""){  
         let query = supabase
             .from('ClashVideo')
             .select('*')
             .eq('clash_id', clash_id);
-        
-        if(mod_secret_token !== ""){ query.eq('mod_secret_token', mod_secret_token) }
-
+    
         const { error, data } = await query
 
         let submissions = await Promise.all(
@@ -49,7 +42,6 @@ function createChatSubmissionsStore(){
         supabase
         .from('ClashVideo')
         .on('*', async (payload) => {
-            console.log(payload);
             if (payload.eventType === 'INSERT') {
                 if (payload.new.clash_id !== clash_id) return
                 let id = ''

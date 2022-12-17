@@ -9,6 +9,7 @@ import _404 from './routes/404.svelte'
 import ModeratorView from './routes/mod/ModeratorView.svelte'
 import ManageModerators from './routes/mod/ManageModerators.svelte'
 import ModeratorInvitePage from './routes/mod/ModeratorInvitePage.svelte'
+import Info from './routes/Info.svelte'
 export default {
     '/': Home,
     '/c/create': Create,
@@ -20,5 +21,6 @@ export default {
     '/mod/clash/:id':ModeratorView,
     '/mod/manage':ManageModerators,
     '/mod/invite/:token':ModeratorInvitePage,
+    '/info/':Info,
     '*': _404
 }

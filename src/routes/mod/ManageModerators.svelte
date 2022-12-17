@@ -3,14 +3,12 @@
     import { user } from "../../store.js";
     import { push } from "svelte-spa-router";
     import { onMount } from "svelte";
-    import { copyLinkToClipboard, shortid } from "../../utils.js";
+    import { shortid, confirmDialog, alertDialog , date_format } from "../../utils.js";
     import { modStateTexts, modStates } from "../../enums/moderator.js";
+    
+    import ClashOverviewListElement from "../../lib/mod/ClashOverviewListElement.svelte";
 
-
-
-
-    let error="",
-        errorText="",
+    let errorText="",
         moderators = [],
         invite_tokens = [],
         clashes=[];
@@ -21,8 +19,14 @@
             .from('moderator_to_streamer')
             .select('*')
             .eq('streamer_id', $user.id)
+            .order('created_at', { ascending: false })
         if (error) {
-            errorText = 'Something went wrong! '
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went wrong loading the moderator list!',
+                ()=>{}
+            )
         } else {
             moderators = data
         }
@@ -34,34 +38,27 @@
             .eq('streamer_id', $user.id)
             .order('created_at', { ascending: false })
         if (error) {
-            errorText = 'Something went wrong! '
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went wrong loading the invite-token list!',
+                ()=>{}
+            )
         } else {
             invite_tokens = data
         }
     }
     async function loadClashes() {
-        /* let { data, error } = await supabase
-            .from('Clash')
-            .select('*')
-            .eq('created_by', $user.id)
-            .order('created_at', { ascending: false }) */
-
         const { data, error } = await supabase.rpc('get_all_moderatable_clashes_for_user')
-
         if (error) {
-            console.log('Cannt load Clashes');
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went wrong loading the clash list!',
+                ()=>{}
+            )
         } else {
             clashes = data
-        }
-    }
-
-    function copyModeratorLinkToClipBoard(token,token_status,expire_date){
-        let alertText = "Invite-link copied to clipboard. \nOnly share this link only with moderators you want to invite";
-        if(token !== "" && token_status && isDateInFuture(expire_date) ){
-            let url = `${location.origin}/#/mod/invite/${token}`;
-                copyLinkToClipboard(url,alertText)
-        }else{
-            alert("Cannot copy invite-link to clipboard")
         }
     }
 
@@ -73,7 +70,12 @@
             .eq('streamer_id', $user.id)
             .eq('moderator_id', modData.moderator_id)
         if (error) {
-            errorText = 'Something went wrong! '
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went updating the moderator status!',
+                ()=>{}
+            )
         } else {
             /* reload moderator list */
             loadModerators()
@@ -81,14 +83,18 @@
     }
 
     async function removeModerator(mod){
-        console.log(mod);
         let { data, error } = await supabase
             .from('moderator_to_streamer')
             .delete()
             .eq('streamer_id', $user.id)
             .eq('moderator_id', mod.moderator_id);
         if (error) {
-            errorText = 'Something went wrong! '
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went wrong while trying to remove a moderator!',
+                ()=>{}
+            )
         } else {
             /* reload moderator list */
             loadModerators()
@@ -104,9 +110,13 @@
             })
             .select('*')
         if (error) {
-            errorText = 'Token could not be generated'
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went wrong creating a new invite-token!',
+                ()=>{}
+            )
         } else {
-            console.log(data);
             loadInviteTokens();
         }
     }
@@ -117,54 +127,88 @@
             .delete()
             .eq('token',sToken)
         if (error) {
-            errorText = 'Token could not be deleted'
+            alertDialog(
+                document.querySelector('#modal'),
+                'Error',
+                'Something went wrong deleting the invite-token!',
+                ()=>{}
+            )
         } else {
             loadInviteTokens();
         }
-    }
-
-
-    function date_format(sDate="",scope="full"){
-        switch (scope) {
-            case 'full':
-                return new Date(sDate).toLocaleString();
-                break;
-            case 'date':
-                return new Date(sDate).toLocaleDateString();
-                break;
-            case 'time':
-                return new Date(sDate).toLocaleTimeString();
-                break;
-        
-            default:
-                break;
-        }
-        
     }
 
     function isDateInFuture(sDate=""){
         return new Date(sDate) > new Date();
     }
 
-
     onMount(()=>{
-
         if(!$user){
-            console.log('in not loggedin');
             push('/')
+        }else{
+            loadModerators();
+            loadClashes()
+            loadInviteTokens();
         }
-
-        loadModerators();
-        loadClashes()
-        loadInviteTokens();
     });
+
+    function openChangeModStatusDialog(mod, status){
+        confirmDialog( 
+            document.querySelector('#modal'), 
+            'Confirm?',
+            'Do you really want to change the status of this moderator?', 
+            ()=>{}, 
+            ()=>{updateModeratorStatus(mod,status)}
+        )
+    }
+
+    function openRemoveDialog(mod){
+        confirmDialog(
+            document.querySelector('#modal'), 
+            'Confirm?',
+            'Do you really want to remove this moderator?', 
+            ()=>{}, 
+            ()=>{removeModerator(mod)}
+        )
+    }
+
+    function openRemoveInviteTokenDialog(sToken){
+        confirmDialog(
+            document.querySelector('#modal'), 
+            'Confirm?',
+            'Do you really want to remove this invite-token?', 
+            ()=>{}, 
+            ()=>{deleteInviteToken(sToken)}
+        )
+    }
+
+    function openCopyInviteTokenAlert(token, token_status, expire_date){
+        if(token !== "" && token_status && isDateInFuture(expire_date) ){
+            let url = `${location.origin}/#/mod/invite/${token}`;
+
+            alertDialog(
+                document.querySelector('#modal'), 
+                'Copied!',
+                'Invite-link copied to clipboard. \n <b>Only</b> share this link with moderators you want to invite', 
+                ()=>{
+                    navigator.clipboard.writeText(url);
+                }
+            )
+        }else{
+            alertDialog(
+                document.querySelector('#modal'), 
+                'Invite-Token invalid',
+                'Cannot copy invite-link to clipboard', 
+                ()=>{}
+            )
+        }
+    }
+
 
 </script>
 
-    <h4>Manage your Moderators here</h4>
-    {#if errorText !== ""}
-        {errorText}
-    {/if}
+<div id="modal"></div>
+
 <div class="d-flex">
     <div class="card border-primary mb-3 mt-1 overflow-hidden"
         style="height: 80vmin; width: 40vmin;">
@@ -178,60 +222,11 @@
             <div class="text-center  w-100">Previous/Running Clashes</div>
         </div>
         <div class="overflow-auto h-100">
-
-            <table class="table table-hover  mt-3">
-                <thead>
-                    <tr>
-                        <th scope="col">Creator</th>
-                        <th scope="col">Topic</th>
-                        <th scope="col">Created on</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-    
-                    {#each clashes as clash, q}
-                        <tr>
-                            <td>
-                                <img
-                                    style="border-radius: 0.25rem;"
-                                    width="32"
-                                    height="32"
-                                    src={clash.avatar_url}
-                                    alt={clash.nickname}
-                                    title={clash.nickname}
-                                />
-                            </td>
-                            <td>
-                                <div class="text-truncate">
-                                    {clash.topic}
-                                </div>
-                            </td>
-                            <td>
-                                {date_format(clash.created_at,'date')}
-                            </td>
-                            <td>
-                                <div>
-                                    <button class="btn btn-secondary"
-                                    style="width: 36px;height:36px"
-                                        on:click={()=>{ window.open(`${location.origin}/#/c/clash/${clash.id}`,'_blank' ) }}
-                                    >
-                                        C
-                                    </button>
-                                    <button class="btn btn-primary" 
-                                        style="width: 36px;height:36px"
-                                        on:click={()=>{ window.open(`${location.origin}/#/mod/clash/${clash.id}`,'_blank' ) }}
-                                    >
-                                        M
-                                    </button>
-                                </div>
-                            </td>
-                            
-                        </tr>
-                    {/each}
-                </tbody>
-    
-            </table>
+            <div class="list-group">
+                {#each clashes as clash, q}
+                    <ClashOverviewListElement clashInfo={clash} />
+                {/each}
+            </div>
         </div>
     </div>
 
@@ -251,17 +246,17 @@
             <tbody>
                 {#each moderators as mod, i}
                     <tr>
-                        <td>
-                            <div>
-                                <button
-                                    class="btn btn-danger rounded-circle"
-                                    on:click={()=>{removeModerator(mod)}}
-                                >
-                                    <i class="fa fa-times"></i>
-                                </button>
-                            </div>
+                        <td style="width: 50px;">
+                            <button
+                                class="btn btn-danger rounded-circle"
+                                on:click={()=>{
+                                    openRemoveDialog(mod)
+                                }}
+                            >
+                                <i class="fa fa-times"></i>
+                            </button>
                         </td>
-                        <td>
+                        <td style="width: 50px;">
                             {#if mod.profile_data}
                                 <img
                                     style="border-radius: 0.25rem;"
@@ -269,6 +264,7 @@
                                     height="32"
                                     src={mod.profile_data.picture}
                                     alt="avatar"
+                                    title={mod.profile_data.nickname}
                                 />
                             {:else}
                                 <span>IMG-missing</span>
@@ -277,19 +273,21 @@
                         <td>
                             {mod.profile_data.nickname}
                         </td>
-                        <td>
-                            <h4>
-                                <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'} ">
+                        <td style="width: 150px;">
+                            <h4 >
+                                <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'} w-100 ">
                                     {mod.active ? modStateTexts[modStates.ACTIVE] : modStateTexts[modStates.DISABLED]}
                                 </span>
                             </h4>
                         </td>
-                        <td>
+                        <td style="width: 100px; overflow:hidden;">
                             {#if mod.active}
                                 <button
                                     type="button"
                                     class="btn btn-danger w-100"
-                                    on:click={()=>{updateModeratorStatus(mod, false )}}
+                                    on:click={()=>{
+                                        openChangeModStatusDialog(mod, false)
+                                    }}
                                 >
                                     Disable
                                 </button>
@@ -297,7 +295,9 @@
                                 <button
                                     type="button"
                                     class="btn btn-warning w-100"
-                                    on:click={()=>{updateModeratorStatus(mod, true )}}
+                                    on:click={()=>{
+                                        openChangeModStatusDialog(mod, true)
+                                    }}
                                 >
                                     Activate
                                 </button>
@@ -306,14 +306,11 @@
                         </td>
                     </tr>
                 {/each}
-
-
             </tbody>
         </table>
-
     </div>
     <div class="card border-primary mb-3 mt-1 overflow-auto"
-    style="height: 80vmin; width: 30vmin;">
+        style="height: 80vmin; width: 30vmin;">
         Invite Tokens:
         <div>
             <button
@@ -336,12 +333,16 @@
                         <td>
                             <div class="d-flex">
                                 <button class="btn rounded-circle text-white border border-white"
-                                    on:click={()=>{deleteInviteToken(token.token)}}
+                                    on:click={()=>{
+                                        openRemoveInviteTokenDialog(token.token)
+                                    }}
                                 >
                                     <span class="fa fa-times"></span>
                                 </button>
                                 <button class="btn rounded-circle ml-3 text-white border border-white "
-                                    on:click={()=>{copyModeratorLinkToClipBoard(token.token, token.active, token.expire_date) }}
+                                    on:click={()=>{
+                                        openCopyInviteTokenAlert(token.token, token.active, token.expire_date) 
+                                    }}
                                 >
                                     <span class="fa fa-clipboard"></span>
                                 </button>
@@ -354,7 +355,6 @@
                         
                     </tr>
                 {/each}
-                
             </tbody>
         </table>
     </div>

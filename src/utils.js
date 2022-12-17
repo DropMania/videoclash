@@ -1,6 +1,8 @@
 import keys from './keys'
 import moment from 'moment'
 import { twitch_token } from './store'
+import ConfirmDialog from './lib/util/ConfirmDialog.svelte'
+import AlertDialog from './lib/util/AlertDialog.svelte'
 export function shortid(len = 11) {
     let result = ''
     let chars =
@@ -83,4 +85,55 @@ export async function copyLinkToClipboard(textToClipboard="", alertMsg=""){
         }
     }
     
+}
+
+
+export function date_format(sDate="",scope="full"){
+    switch (scope) {
+        case 'full':
+            return new Date(sDate).toLocaleString();
+            break;
+        case 'date':
+            return new Date(sDate).toLocaleDateString();
+            break;
+        case 'time':
+            return new Date(sDate).toLocaleTimeString();
+            break;
+    
+        default:
+            break;
+    }
+    
+}
+
+export async function confirmDialog(parent=document.getElementById('app'), titleText="", bodyText="", cancleCallback=()=>{}, okayCallback=()=>{}){
+    let el = new ConfirmDialog({
+        target: parent,
+        props:{
+            title: titleText,
+            body: bodyText,
+            onCancel: ()=>{
+                el.$destroy()
+                cancleCallback()
+            },
+            onOkay: ()=>{
+                el.$destroy()
+                okayCallback()
+            }
+        }
+    });
+}
+
+export async function alertDialog(parent=document.getElementById('app'), titleText="", bodyText="", okayCallback=()=>{}){
+    let el = new AlertDialog({
+        target: parent,
+        props:{
+            title: titleText,
+            body: bodyText,
+            onOkay: ()=>{
+                el.$destroy()
+                okayCallback()
+            }
+        }
+    });
 }

@@ -49,11 +49,14 @@
                 />
             </h4>
             <div>
-
                 <a class="btn btn-secondary " href="/#/mod/manage">Moderators</a>
                 <div class="btn btn-secondary my-2 my-sm-0" on:click={signout}>
                     Logout
                 </div>
+                <a class="btn btn-secondary " href="/#/info"><i class="fa fa-info"></i></a>
+                <a class="btn btn-secondary " href="https://discord.gg/Vkvs8277tg">
+                    <img src="./src/assets/img/discord.png" alt="" style="height: 16px;" title="Join Discord">
+                </a>
             </div>
         {:else}
             
@@ -61,7 +64,12 @@
                 class="btn btn-secondary my-2 my-sm-0"
                 on:click={signInWithTwitch}>Login with Twitch</button
             >
+            <a class="btn btn-secondary " href="/#/info"><i class="fa fa-info"></i></a>
+            <a class="btn btn-secondary " href="https://discord.gg/Vkvs8277tg">
+                <img src="./src/assets/img/discord.png" alt="" style="height: 16px;" title="Join Discord">
+            </a>
         {/if}
+
     </div>
 </nav>
 <div class="container text-center mt-5 d-flex flex-column align-items-center">
