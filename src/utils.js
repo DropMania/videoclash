@@ -137,3 +137,8 @@ export async function alertDialog(parent=document.getElementById('app'), titleTe
         }
     });
 }
+
+/* gets the difference in hours of two given dates */
+export function getHoursDiff(startDate, endDate) {
+    return Math.round(Math.abs(endDate - startDate) / 3600000);
+}

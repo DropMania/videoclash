@@ -55,6 +55,11 @@
                 The Best Video</button
             >
         </a>
+        <a href="/#/t/create">
+            <button type="button" class="btn btn-secondary btn-lg mt-5">
+                Tier-List
+            </button>
+        </a>
     </div>
     <!-- <Sidebar bind:show={sidebar_show} /> -->
 {:else}

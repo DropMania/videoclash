@@ -41,6 +41,27 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   basic tier List
     -   chat submitts a number of videos
     -   streamer ranks them in the tier-list
+    -   game-options:
+        -   topic
+        -   submission-options:
+            -   channel-points submissions
+            -   chat submissions
+            -   web-page submissions
+        -   Max-video count
+        -   max submissions per user
+        -   max video-lenght
+    -   display-ideas:
+        -   small card for submission display
+            -   small-thumbnail of video
+                -   on:click => open preview window
+            -   Title with Name of Video
+            -   Submitter on the bottom
+        -   Tiers freely customizable
+            -   F-S default
+            -   add/remove tiers
+            -   change Tier-Title
+            -   
+        -   not ranked videos at the bottom in "unrankted" List
 
 -   Guess-my-Video 
     -   Group/Collab 

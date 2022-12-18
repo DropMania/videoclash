@@ -10,6 +10,8 @@ import ModeratorView from './routes/mod/ModeratorView.svelte'
 import ManageModerators from './routes/mod/ManageModerators.svelte'
 import ModeratorInvitePage from './routes/mod/ModeratorInvitePage.svelte'
 import Info from './routes/Info.svelte'
+import CreateTierList from './routes/t/CreateTierList.svelte'
+import TierList from './routes/t/TierList.svelte'
 export default {
     '/': Home,
     '/c/create': Create,
@@ -22,5 +24,7 @@ export default {
     '/mod/manage':ManageModerators,
     '/mod/invite/:token':ModeratorInvitePage,
     '/info/':Info,
+    '/t/create': CreateTierList,
+    '/t/list/:id': TierList,
     '*': _404
 }

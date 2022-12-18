@@ -219,7 +219,7 @@
             >
                 <span class="fa fa-refresh"></span>
             </button>
-            <div class="text-center  w-100">Previous/Running Clashes</div>
+            <div class="text-center w-100">Previous/Running Clashes</div>
         </div>
         <div class="overflow-auto h-100">
             <div class="list-group">

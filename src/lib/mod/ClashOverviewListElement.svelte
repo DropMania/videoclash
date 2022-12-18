@@ -1,5 +1,7 @@
 <script>
     import { date_format } from "../../utils.js";
+    import { fly, fade, slide } from 'svelte/transition';
+    import { transition_in } from "svelte/internal";
     export let clashInfo={};
 
     let bToggleExtraInfo = false;
@@ -48,7 +50,7 @@
         </div>
     </div>
     {#if bToggleExtraInfo}
-        <div class="text-start">
+        <div class="text-start overflow-hidden" transition:slide={{ duration: 400}}>
             <div>
                 Created by: {clashInfo.nickname}
             </div>
