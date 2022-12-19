@@ -43,12 +43,12 @@
                     if (error) {
                         console.log('Something went wrong.. hmmm :/');
                     } else {
-                        console.log('synced user data');
+                        // console.log('synced user data');
                         localStorage.setItem('last_user_data_sync', new Date() );
                     }
                 })
             }else{
-                console.log('skiped user sync');
+                // console.log('skiped user sync');
             }
         } else {
             $user = null
@@ -77,8 +77,7 @@
                     Logout
                 </div>
                 <a class="btn btn-secondary " href="/#/info"><i class="fa fa-info"></i></a>
-                <a class="btn btn-secondary " href={`https://discord.gg/${keys.discordId}`} >
-
+                <a class="btn btn-secondary " href={keys.discordLink} >
                     <img src="./src/assets/img/discord.png" alt="" style="height: 16px;" title="Join Discord">
                 </a>
             </div>
@@ -89,7 +88,7 @@
                     on:click={signInWithTwitch}>Login with Twitch</button
                 >
                 <a class="btn btn-secondary " href="/#/info"><i class="fa fa-info"></i></a>
-                <a class="btn btn-secondary " href={`https://discord.gg/${keys.discordId}`}>
+                <a class="btn btn-secondary " href={keys.discordLink}>
                     <img src="./src/assets/img/discord.png" alt="" style="height: 16px;" title="Join Discord">
                 </a>
             </div>

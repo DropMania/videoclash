@@ -1,7 +1,6 @@
 <script>
     import { date_format } from "../../utils.js";
-    import { fly, fade, slide } from 'svelte/transition';
-    import { transition_in } from "svelte/internal";
+    import { slide } from 'svelte/transition';
     export let clashInfo={};
 
     let bToggleExtraInfo = false;
@@ -13,7 +12,18 @@
         <div class="flex-fill d-flex flex-row"
             style="cursor: pointer; "
             on:click={()=>{ bToggleExtraInfo = !bToggleExtraInfo }} 
-        >
+        >   
+            <div class="me-1">
+                {#if bToggleExtraInfo}
+                    <span class="badge rounded-pill bg-info">
+                        <span class="fa fa-angle-up "></span>
+                    </span>
+                {:else}
+                    <span class="badge rounded-pill bg-info">
+                        <span class="fa fa-angle-down "></span>
+                    </span>
+                {/if}
+            </div>
             <img
                 style="border-radius: 0.25rem;"
                 class="mr-3"
@@ -23,13 +33,14 @@
                 alt={clashInfo.nickname}
                 title={clashInfo.nickname}
             />
+
             <div class="flex-fill p-1">
-                <h5 class="text-truncate text-start" style="max-width: 170px;" title={clashInfo.topic} >
+                <h5 class="text-truncate text-start" style="max-width: 160px;" title={clashInfo.topic} >
                     {clashInfo.topic}
                 </h5>
             </div>
         </div>
-        <div class="align-items-stretch">
+        <div class="align-items-stretch">         
             <button
                 type="button"
                 class="btn btn-primary"

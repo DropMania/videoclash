@@ -13,6 +13,10 @@
         invite_tokens = [],
         clashes=[];
 
+    let bLoadingModerators=true,
+        bLoadingTokens=true,
+        bLoadingClashes=true;
+
 
     async function loadModerators() {
         let { data, error } = await supabase
@@ -30,6 +34,7 @@
         } else {
             moderators = data
         }
+        bLoadingModerators=false;
     }
     async function loadInviteTokens() {
         let { data, error } = await supabase
@@ -47,6 +52,7 @@
         } else {
             invite_tokens = data
         }
+        bLoadingTokens = false;
     }
     async function loadClashes() {
         const { data, error } = await supabase.rpc('get_all_moderatable_clashes_for_user')
@@ -60,6 +66,7 @@
         } else {
             clashes = data
         }
+        bLoadingClashes=false;
     }
 
     async function updateModeratorStatus(modData, bStatus=false){
@@ -189,7 +196,7 @@
             alertDialog(
                 document.querySelector('#modal'), 
                 'Copied!',
-                'Invite-link copied to clipboard. \n <b>Only</b> share this link with moderators you want to invite', 
+                'Invite-link copied to clipboard. \n <b>Only</b> share this link with moderators you want to invite. \n The invite-token is valid for 24h', 
                 ()=>{
                     navigator.clipboard.writeText(url);
                 }
@@ -198,7 +205,7 @@
             alertDialog(
                 document.querySelector('#modal'), 
                 'Invite-Token invalid',
-                'Cannot copy invite-link to clipboard', 
+                'Cannot copy invite-link to clipboard. \nThis invite-token is either disabled or expired', 
                 ()=>{}
             )
         }
@@ -216,17 +223,22 @@
             <button class="btn btn-secondary ml-3"
                 type="button"
                 on:click={loadClashes}
+                title="reload clashes"
             >
                 <span class="fa fa-refresh"></span>
             </button>
             <div class="text-center w-100">Previous/Running Clashes</div>
         </div>
         <div class="overflow-auto h-100">
-            <div class="list-group">
-                {#each clashes as clash, q}
-                    <ClashOverviewListElement clashInfo={clash} />
-                {/each}
-            </div>
+            {#if bLoadingClashes}
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            {:else}
+                <div class="list-group">
+                    {#each clashes as clash, q}
+                        <ClashOverviewListElement clashInfo={clash} />
+                    {/each}
+                </div>
+            {/if}
         </div>
     </div>
 
@@ -244,70 +256,81 @@
                 </tr>
             </thead>
             <tbody>
-                {#each moderators as mod, i}
-                    <tr>
-                        <td style="width: 50px;">
-                            <button
-                                class="btn btn-danger rounded-circle"
-                                on:click={()=>{
-                                    openRemoveDialog(mod)
-                                }}
-                            >
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </td>
-                        <td style="width: 50px;">
-                            {#if mod.profile_data}
-                                <img
-                                    style="border-radius: 0.25rem;"
-                                    width="32"
-                                    height="32"
-                                    src={mod.profile_data.picture}
-                                    alt="avatar"
-                                    title={mod.profile_data.nickname}
-                                />
-                            {:else}
-                                <span>IMG-missing</span>
-                            {/if}
-                        </td>
-                        <td>
-                            {mod.profile_data.nickname}
-                        </td>
-                        <td style="width: 150px;">
-                            <h4 >
-                                <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'} w-100 ">
-                                    {mod.active ? modStateTexts[modStates.ACTIVE] : modStateTexts[modStates.DISABLED]}
-                                </span>
-                            </h4>
-                        </td>
-                        <td style="width: 100px; overflow:hidden;">
-                            {#if mod.active}
-                                <button
-                                    type="button"
-                                    class="btn btn-danger w-100"
-                                    on:click={()=>{
-                                        openChangeModStatusDialog(mod, false)
-                                    }}
-                                >
-                                    Disable
-                                </button>
-                            {:else}
-                                <button
-                                    type="button"
-                                    class="btn btn-warning w-100"
-                                    on:click={()=>{
-                                        openChangeModStatusDialog(mod, true)
-                                    }}
-                                >
-                                    Activate
-                                </button>
+                {#if !bLoadingModerators}
 
-                            {/if}
-                        </td>
-                    </tr>
-                {/each}
+                    {#each moderators as mod, i}
+                        <tr>
+                            <td style="width: 50px;">
+                                <button
+                                    class="btn btn-danger rounded-circle"
+                                    on:click={()=>{
+                                        openRemoveDialog(mod)
+                                    }}
+                                >
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                            <td style="width: 50px;">
+                                {#if mod.profile_data}
+                                    <img
+                                        style="border-radius: 0.25rem;"
+                                        width="32"
+                                        height="32"
+                                        src={mod.profile_data.picture}
+                                        alt="avatar"
+                                        title={mod.profile_data.nickname}
+                                    />
+                                {:else}
+                                    <span>IMG-missing</span>
+                                {/if}
+                            </td>
+                            <td>
+                                {mod.profile_data.nickname}
+                            </td>
+                            <td style="width: 150px;">
+                                <h4 >
+                                    <span class="badge rounded-pill text-black {mod.active ? 'bg-success' : 'bg-danger'} w-100 ">
+                                        {mod.active ? modStateTexts[modStates.ACTIVE] : modStateTexts[modStates.DISABLED]}
+                                    </span>
+                                </h4>
+                            </td>
+                            <td style="width: 100px; overflow:hidden;">
+                                {#if mod.active}
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger w-100"
+                                        on:click={()=>{
+                                            openChangeModStatusDialog(mod, false)
+                                        }}
+                                    >
+                                        Disable
+                                    </button>
+                                {:else}
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning w-100"
+                                        on:click={()=>{
+                                            openChangeModStatusDialog(mod, true)
+                                        }}
+                                    >
+                                        Activate
+                                    </button>
+
+                                {/if}
+                            </td>
+                        </tr>
+                    {/each}
+                {/if}
+
             </tbody>
         </table>
+
+        {#if bLoadingModerators}
+            <div class="w-100 h-100">
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            </div>
+        {/if}
+
     </div>
     <div class="card border-primary mb-3 mt-1 overflow-auto"
         style="height: 80vmin; width: 30vmin;">
@@ -328,34 +351,42 @@
                 </tr>
             </thead>
             <tbody>
-                {#each invite_tokens as token}
-                    <tr class={token.active && isDateInFuture(token.expire_date) ? 'bg-primary' : 'bg-secondary'}>
-                        <td>
-                            <div class="d-flex">
-                                <button class="btn rounded-circle text-white border border-white"
-                                    on:click={()=>{
-                                        openRemoveInviteTokenDialog(token.token)
-                                    }}
-                                >
-                                    <span class="fa fa-times"></span>
-                                </button>
-                                <button class="btn rounded-circle ml-3 text-white border border-white "
-                                    on:click={()=>{
-                                        openCopyInviteTokenAlert(token.token, token.active, token.expire_date) 
-                                    }}
-                                >
-                                    <span class="fa fa-clipboard"></span>
-                                </button>
-                            </div>
-                        </td>
-                        <td>*****</td>
-                        <td>
-                            {date_format(token.expire_date)}
-                        </td>
-                        
-                    </tr>
-                {/each}
+                {#if !bLoadingTokens}
+                    {#each invite_tokens as token}
+                        <tr class={token.active && isDateInFuture(token.expire_date) ? 'bg-primary' : 'bg-secondary'}>
+                            <td>
+                                <div class="d-flex">
+                                    <button class="btn rounded-circle text-white border border-white"
+                                        on:click={()=>{
+                                            openRemoveInviteTokenDialog(token.token)
+                                        }}
+                                    >
+                                        <span class="fa fa-times"></span>
+                                    </button>
+                                    <button class="btn rounded-circle ml-3 text-white border border-white "
+                                        on:click={()=>{
+                                            openCopyInviteTokenAlert(token.token, token.active, token.expire_date) 
+                                        }}
+                                    >
+                                        <span class="fa fa-clipboard"></span>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>*****</td>
+                            <td>
+                                {date_format(token.expire_date)}
+                            </td>
+                            
+                        </tr>
+                    {/each}
+                {/if}
             </tbody>
         </table>
+
+        {#if bLoadingTokens}
+            <div class="w-100 ">
+                <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            </div>
+        {/if}
     </div>
 </div>

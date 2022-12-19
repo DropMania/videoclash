@@ -4,15 +4,49 @@
     import DropArea from "../../lib/t/DropArea.svelte";
     export let params = {}
 
-    let Ranks = ['S','A','B','C','D','E','F','sehr sehr schlecht']
+    let Ranks = [
+        {
+            name:'S',
+            items:[]
+        },
+        {
+            name:'A',
+            items:[]
+        },
+        {
+            name:'B',
+            items:[]
+        },
+        {
+            name:'C',
+            items:[]
+        },
+        {
+            name:'D',
+            items:[]
+        },
+        {
+            name:'E',
+            items:[]
+        },
+        {
+            name:'F',
+            items:[]
+        },
+        {
+            name:'sehr sehr schlecht',
+            items:[]
+        }
+    ];
+
     let Videos = [
-        {video_title:'The best video ever',submitter_name:'Chatter123'},
-        {video_title:'The best video ever',submitter_name:'Chatter123'},
-        {video_title:'The best video ever',submitter_name:'Chatter123'},
-        {video_title:'The best video ever',submitter_name:'Chatter123'},
-        {video_title:'The best video ever',submitter_name:'Chatter123'},
-        {video_title:'The best video ever',submitter_name:'Chatter123'},
-        {video_title:'The best video ever',submitter_name:'Chatter123'}
+        {video_title:'Ken Ashcorp - Touch Fluffy Tailwjihb fhwgbfhwbefh wehfhewbfghub wihbfghweb',submitter_name:'MrBartagam', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'},
+        {video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:'MrBartagam igfbnwe wziufbe wfezb uh', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'},
+        {video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:'MrBartagam', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'},
+        {video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:'MrBartagam', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'},
+        {video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:'MrBartagam', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'},
+        {video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:'MrBartagam', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'},
+        {video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:'MrBartagam', img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'}
     ]
 
 
@@ -24,7 +58,7 @@
     <div class="list-group">
 
         {#each Ranks as rank}
-            <DropArea dropRankText={rank}></DropArea>
+            <DropArea rank_data={rank}></DropArea>
         {/each}
 
 
