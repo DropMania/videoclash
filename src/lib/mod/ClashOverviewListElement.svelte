@@ -44,7 +44,7 @@
             <button
                 type="button"
                 class="btn btn-primary"
-                title="Clash-View"
+                title="Game-View"
                 on:click={()=>{ window.open(`${location.origin}/#/c/clash/${clashInfo.id}`,'_blank' ) }}
             >
                 <i class="fa fa-gamepad"></i>

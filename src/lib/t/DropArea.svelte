@@ -1,45 +1,68 @@
 <script>
     import VideoCard from "../../lib/t/VideoCard.svelte";
     export let rank_data = {};
+    export let RanksObject;
 
     let bHovering = false;
+    let bClickedToEdit=false;
     function handleDragEnter(e){
         e.preventDefault();
-        bHovering = true
-        // console.log('dragEnter',rank_data.name);
+        bHovering = true;
     }
     function handleDragLeave(e){
         e.preventDefault();
-        bHovering = false
-        // console.log('dragLeave',rank_data.name);
+        bHovering = false;
     }
     function handleDragDrop(e){
         e.preventDefault();
-        console.log('dragDrop',rank_data.name);
-        console.log(e);
+        bHovering = false
+        let drop_data = JSON.parse(e.dataTransfer.getData('application/json'));
+
+        /* disable drop on the same DropArea */
+        if(drop_data.rank.id === rank_data.id)return;
+
+        /* add the new element */
+        for(let i = 0; i < RanksObject.length; i++){
+            if(RanksObject[i].id === rank_data.id){
+                RanksObject[i].items = [...RanksObject[i].items, drop_data.video_data];
+                break;
+            }              
+        }
+
+        /* remove the old element */
+        for(let x = 0; x < RanksObject.length; x++){
+            if(RanksObject[x].id === drop_data.rank.id){
+                RanksObject[x].items = drop_data.rank.items.filter((element)=>{
+                    return element.id !== drop_data.video_data.id
+                })
+                break;
+            }              
+        }
     }
 </script>
 
-<div class="list-group-item d-flex flex-row p-0 m-1 " style="height: 200px;">
-    <div class="rank_area card border-success h-100 align-middle " style="width: 100px;">
-        <span class="h-100 w-100 align-middle fw-bold">
-            {rank_data.name}
-        </span>
-    </div>
-    <div class="drop_area card flex-fill h-100 d-flex flex-row flex-wrap {bHovering? 'border-warning' : '' }"
-        on:dragenter={handleDragEnter} 
-        on:dragleave={handleDragLeave}  
-        on:drop={handleDragDrop} 
-        on:dragover={(e)=>{
-            e.preventDefault();
-            return false
-        }}
-    >
-        {#each rank_data.items as item}
-            <VideoCard video_data={item}></VideoCard>
-        {/each}
+<div class="list-group-item d-flex flex-row align-items-stretch p-0 m-1 " style="min-height: 180px;">
 
-    </div>
+        {#if rank_data.type === 'ranking'}
+            <div class="card border-success" style="width: 100px; min-width:100px;">
+                {rank_data.name}
+            </div>
+        {/if}
+        <div class="card flex-fill d-flex flex-row flex-wrap overflow-auto   {bHovering? 'border-warning' : '' }"
+            on:dragenter={handleDragEnter} 
+            on:dragleave={handleDragLeave}  
+            on:drop={handleDragDrop} 
+            on:dragover={(e)=>{
+                e.preventDefault();
+                return false
+            }}
+        >
+            {#each rank_data.items as item}
+                <VideoCard video_data={item} rank={rank_data}></VideoCard>
+            {/each}
+
+        </div>
+
 </div>
 
 

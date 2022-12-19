@@ -1,10 +1,14 @@
 <script>
 
     export let video_data = {};
+    export let rank={}
     
-    function handleDragStart(e,item){
+    function handleDragStart(e){
 
-        e.dataTransfer.setData('application/json', item);
+        e.dataTransfer.setData('application/json', JSON.stringify({
+            video_data,
+            rank
+        }));
         console.log('dragStart',video_data.video_title);
     }    
     function handleDragEnd(e){
@@ -27,12 +31,12 @@
 
 <div class="card border border-secondary m-1 user-select-none" 
     draggable=true 
-    on:dragstart={(e)=>{ handleDragStart(e,video_data) }}
+    on:dragstart={(e)=>{ handleDragStart(e) }}
     on:dragend={handleDragEnd}
     on:touchstart={handleTouchStart}
     on:touchmove={handleTouchMove}
     on:touchend={handleTouchEnd}
-    style="cursor: move; width:250px"
+    style="cursor: move; width:250px; height:160px"
 >
     <!-- <h5 class="card-header">{video_data.video_title}</h5> -->
     <div class="card-body d-flex flex-column">
@@ -50,7 +54,7 @@
                 <span class="btn btn-secondary fa fa-expand"></span>
             </div>
         </div>
-        <div class="d-flex ">
+        <div class="d-flex">
             <span class="card-subtitle text-muted text-truncate flex-grow-1"
                 title={video_data.submitter_name}
             >
