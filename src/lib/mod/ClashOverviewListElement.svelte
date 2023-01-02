@@ -34,13 +34,11 @@
                 title={clashInfo.nickname}
             />
 
-            <div class="flex-fill p-1">
-                <h5 class="text-truncate text-start" style="max-width: 160px;" title={clashInfo.topic} >
-                    {clashInfo.topic}
-                </h5>
+            <div class="flex-fill p-1 overflow-hidden text-start text-truncate" style="width: 45em;" title={clashInfo.topic}>
+                {clashInfo.topic}
             </div>
         </div>
-        <div class="align-items-stretch">         
+        <div class="align-items-stretch d-flex flex-row">         
             <button
                 type="button"
                 class="btn btn-primary"

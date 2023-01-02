@@ -21,7 +21,7 @@ export default {
     '/tos': TOS,
     '/b/game/:id': GameB,
     '/mod/clash/:id':ModeratorView,
-    '/mod/manage':ManageModerators,
+    '/mod/manage/:option':ManageModerators,
     '/mod/invite/:token':ModeratorInvitePage,
     '/info/':Info,
     '/t/create': CreateTierList,

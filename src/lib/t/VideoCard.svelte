@@ -2,12 +2,14 @@
 
     export let video_data = {};
     export let rank={}
+    export let rank_index;
     
     function handleDragStart(e){
 
         e.dataTransfer.setData('application/json', JSON.stringify({
             video_data,
-            rank
+            rank,
+            rank_index
         }));
         console.log('dragStart',video_data.video_title);
     }    
@@ -65,12 +67,15 @@
      
         </div>
     </div>
+
+    <!-- <div class="" style="border: 1px solid red;box-sizing:border-box;"></div> -->
+
 </div>
 
 <style>
     .small{
         /* height: 50%; */
-        width: 50%;
+        width: 110px;
     }
 
 </style>
