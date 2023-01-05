@@ -1,26 +1,24 @@
 <script>
-    import { push } from 'svelte-spa-router';
-    import Sidebar from '../lib/util/Sidebar.svelte';
+    import { push } from 'svelte-spa-router'
+    import Sidebar from '../lib/util/Sidebar.svelte'
     import { user } from '../store'
-    import supabase from '../supabase.js';
-    
-    let gameIdSearchValue = "",
-        searchIsValid = true;
+    import supabase from '../supabase.js'
 
+    let gameIdSearchValue = '',
+        searchIsValid = true
 
-
-    async function onSearchGameIdBtn(){
+    async function onSearchGameIdBtn() {
         searchForGameId(gameIdSearchValue)
     }
-    async function onKeyPressSearchGameId(e){
-        if(e.key !== 'Enter')return;
+    async function onKeyPressSearchGameId(e) {
+        if (e.key !== 'Enter') return
         searchForGameId(gameIdSearchValue)
     }
 
-    async function searchForGameId(game_id){
-        if(await isGameIdExsitsting(game_id)){
+    async function searchForGameId(game_id) {
+        if (await isGameIdExsitsting(game_id)) {
             push(`/c/submit/${game_id}`)
-        }else{
+        } else {
             searchIsValid = false
         }
     }
@@ -31,11 +29,11 @@
             .select('*')
             .eq('id', game_id)
         if (error) {
-            return false;
+            return false
         } else {
-            if(data.length > 0){
-                return true;
-            }else{
+            if (data.length > 0) {
+                return true
+            } else {
                 return false
             }
         }
@@ -52,12 +50,12 @@
         </a>
         <a href="/#/b/create">
             <button type="button" class="btn btn-secondary btn-lg mt-5">
-                The Best Video</button
+                The Best Video (WIP)</button
             >
         </a>
         <a href="/#/t/create">
             <button type="button" class="btn btn-secondary btn-lg mt-5">
-                Tier-List
+                Tier-List (WIP)
             </button>
         </a>
     </div>
@@ -65,4 +63,3 @@
 {:else}
     You need to log in to create a clash!
 {/if}
-
