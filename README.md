@@ -11,7 +11,7 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 -   submits extra options?
     -   Comments to submit (optional) max 256 lenght
         -   give a reason or some funny comment to your submission
-    -   set starting/end point of video (theoretisch über YT url-parameter möglich oder nicht?)
+    -   set starting/end point of video (theoretically possible with YT url-parameter, but only for YT links)
 -   post link of clashing videos
     -   !clashlink 1/2 to get the link of either submits currently battleing 
     -   button beneath video-previews with the same function => post Link of video
@@ -38,17 +38,29 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   best video gets voted by chat
 -   Tier-List 
     -   singelplayer
-    -   basic tier List
-    -   chat submitts a number of videos
+    -   basicly tier List
+    -   submission option:
+        -   chat submitts a number of videos to be ranked
+        -   only player submitts all videos to be ranked
     -   streamer ranks them in the tier-list
     -   game-options:
         -   topic
         -   submission-options:
             -   channel-points submissions
             -   chat submissions
+                -   who can submit?
+                    -   all => default
+                    -   sub-only?   => how do you check this?
+                    -   vip only?   => how do you check this?
+                    -   subs + vip?   => how do you check this?
             -   web-page submissions
+            -   force login to submit?
         -   Max-video count
+            -   default: 50?
+            -   max: infinite
         -   max submissions per user
+            -   default: 1
+            -   max: infinite 
         -   max video-lenght
     -   display-ideas:
         -   small card for submission display
@@ -62,16 +74,18 @@ Create a Clash to let your community submit Videos and let them vote wich is the
             -   change Tier-Title
             -   
         -   not ranked videos at the bottom in "unrankted" List
+    
+    -   possible problems:
+        -   alot of videos to rank the higher the limit and community
 
 -   Guess-my-Video 
     -   Group/Collab 
     -   PvP 
-    -   Spieler stellen Videos ein Dann wird jedes Video nacheinander gezeigt bei jedem Video muss der Chat voten von wem das Video ursprünglich kommt. Spieler bekommt Punkte berechnet aus wieviel Votes richtig gestimmt haben. Der Spieler mit den meisten Punkten gewinnt. 
-    -   chatter submit videos
-    -   videos will be shown after each other
-        -   chat votes who originaly submitted the video
-    -   score will be calculated based on right answers
-    -   chatter with most point wins the game
+    -   players submit videos
+    -   videos will be shown round after round
+        -   each round chat votes who originaly submitted the video
+    -   score will be calculated based on right votes
+    -   player with most point wins the game
     
 -   Topic-picked-for-you  
     -   theme will be pickt for you
@@ -82,11 +96,11 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   PvP
     -   Chat reicht Videos ein und die Spieler müssen das kurz beschreiben. Textform (nicht verbal). 
     -   chatters submitt videos
-    -   players have to descripe the video (not verbally)
+    -   players have to descripe the video (not verbally, text only)
     -   player or TTS read out the description
     -   chat votes for best, funniest or most fitting description
     -   points will be given out based on voting
-    -   most point win
+    -   player with the most points win
     
 -   find-the-right-video 
     -   group/collab 
@@ -95,7 +109,7 @@ Create a Clash to let your community submit Videos and let them vote wich is the
     -   player have to find and submitt fitting videos/clips/yt-shorts/tiktoks
     -   NOTE: topic should not be to concrete and should have leeway of interpretation
         -   one word or max one sentance
-        -   e.g. "someone that is lost" => video of Mitchi
+        -   e.g. "someone that is lost" => video of some stupid moment or a lost person
         -   only short videos
     
 -   Community-vs-Community-Clash 
@@ -112,6 +126,8 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 -   Twitch-Clip-Fiasko
     -   random clips or pickt out clips from the players Twitch-channel will be choosen
     -   clash for the best clip 
+    -   pick a range from when to when videos should be picket
+        -   e.g. the last 30 days, from 2020 to today etc.
 
 ## Tournament
 
@@ -134,9 +150,14 @@ Create a Clash to let your community submit Videos and let them vote wich is the
 -   Overview of active or previews created Clashes on ~~Home-Page~~ moderator-page (owned & moderation) :white_check_mark:
 -   Contacts-Page
     -   About us
-    -   contact us form
--   Suggestions-Page
-    -   Logged in users can make suggestions of improvments, new features or buggs
-    -   max 50 suggestions at a time (spam protection)
-
+    -   ~~contact us form~~ :white_check_mark:
+        -   done with socials/discord link on page
+-   ~~Suggestions-Page~~ :white_check_mark:
+    -   ~~Logged in users can make suggestions of improvments, new features or buggs~~
+    -   ~~max 50 suggestions at a time (spam protection)~~
+    -   Done with socials/discord links on page
+        -   discord channels: "suggestion" and "bug-and-error-reports"
+-   Discord-Bot (VideoClash-Discord only)
+    -   post ongoing or new created games in specified channel
+    -   with link to the channel of the game creator (optional)
 

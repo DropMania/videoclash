@@ -88,21 +88,23 @@ export async function copyLinkToClipboard(textToClipboard="", alertMsg=""){
 }
 
 
-export function date_format(sDate="",scope="full"){
+export function date_format(sDate="",scope="full",length="medium"){
+    let options = {};
+
     switch (scope) {
         case 'full':
-            return new Date(sDate).toLocaleString();
+            options = {dateStyle:length,timeStyle:length};
             break;
         case 'date':
-            return new Date(sDate).toLocaleDateString();
+            options = {dateStyle:length};
             break;
         case 'time':
-            return new Date(sDate).toLocaleTimeString();
+            options = {timeStyle:length};
             break;
-    
         default:
             break;
-    }
+        }
+    return new Date(sDate).toLocaleString(undefined, options).replace(',','');
     
 }
 

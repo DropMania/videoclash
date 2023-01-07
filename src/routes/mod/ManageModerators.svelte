@@ -22,7 +22,11 @@
     async function loadModerators() {
         let { data, error } = await supabase
             .from('moderator_to_streamer')
-            .select('*')
+            .select(`created_at,moderator_id,active,
+                users (
+                    avatar_url,name,nickname
+                )
+            `)
             .eq('streamer_id', $user.id)
             .order('created_at', { ascending: false })
         if (error) {
@@ -222,7 +226,7 @@
     <div class="card border-primary overflow-hidden "
         style="height: 80vmin; width: 120vmin;">
 
-        <div class="d-flex flex-row overflow-hidden ">
+        <div class="d-flex flex-row overflow-hidden">
             <ul class="nav nav-pills flex-column">
                 <li class="nav-item">
                   <a class="nav-link {params.option === 'moderators' ? 'active' : ''}" href="#/mod/manage/moderators">Moderators</a>
@@ -265,21 +269,21 @@
                                                     </button>
                                                 </td>
                                                 <td style="width: 50px;">
-                                                    {#if mod.profile_data}
+                                                    {#if mod.users}
                                                         <img
                                                             style="border-radius: 0.25rem;"
                                                             width="32"
                                                             height="32"
-                                                            src={mod.profile_data.picture}
+                                                            src={mod.users.avatar_url}
                                                             alt="avatar"
-                                                            title={mod.profile_data.nickname}
+                                                            title={mod.users.nickname}
                                                         />
                                                     {:else}
                                                         <span>IMG-missing</span>
                                                     {/if}
                                                 </td>
                                                 <td>
-                                                    {mod.profile_data.nickname}
+                                                    {mod.users.nickname}
                                                 </td>
                                                 <td style="width: 150px;">
                                                     <h4 >
@@ -383,7 +387,7 @@
                                     <tbody>
                                         {#if !bLoadingTokens}
                                             {#each invite_tokens as token}
-                                                <tr class={token.active && isDateInFuture(token.expire_date) ? 'bg-primary' : 'bg-secondary'}>
+                                                <tr class={token.active && isDateInFuture(token.expire_date) ? 'bg-success' : 'bg-secondary'}>
                                                     <td>
                                                         <div class="d-flex">
                                                             <button class="btn rounded-circle text-white border border-white"
@@ -402,7 +406,7 @@
                                                             </button>
                                                         </div>
                                                     </td>
-                                                    <!-- <td>*****</td> -->
+
                                                     <td>
                                                         {date_format(token.expire_date)}
                                                     </td>
