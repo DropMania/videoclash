@@ -88,22 +88,24 @@
                 />
             </h4>
             <div>
-                <a class="btn btn-secondary " href="/#/mod/manage/moderators"
-                    title="Manage Moderators"
-                    >M</a
+                <a
+                    class="btn btn-secondary "
+                    href="/#/mod/manage/moderators"
+                    title="Manage Moderators">M</a
                 >
                 <div class="btn btn-secondary my-2 my-sm-0" on:click={signout}>
                     Logout
                 </div>
-                <a class="btn btn-secondary " href="/#/info"
-                    title="Info-Page"
+                <a class="btn btn-secondary " href="/#/info" title="Info-Page"
                     ><i class="fa fa-info" /></a
                 >
-                <a class="btn btn-secondary " href={keys.discordLink}
+                <a
+                    class="btn btn-secondary "
+                    href={keys.discordLink}
                     title="Join the Discord"
                 >
                     <img
-                        src="./src/assets/img/discord.png"
+                        src="assets/img/discord.png"
                         alt=""
                         style="height: 16px;"
                         title="Join Discord"
@@ -121,7 +123,7 @@
                 >
                 <a class="btn btn-secondary " href={keys.discordLink}>
                     <img
-                        src="./src/assets/img/discord.png"
+                        src="assets/img/discord.png"
                         alt=""
                         style="height: 16px;"
                         title="Join Discord"

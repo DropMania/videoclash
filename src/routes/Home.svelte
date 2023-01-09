@@ -48,12 +48,12 @@
                 Tournament</button
             >
         </a>
-        <a href="/#/b/create">
+        <a href="/#/wip">
             <button type="button" class="btn btn-secondary btn-lg mt-5">
                 The Best Video (WIP)</button
             >
         </a>
-        <a href="/#/t/create">
+        <a href="/#/wip">
             <button type="button" class="btn btn-secondary btn-lg mt-5">
                 Tier-List (WIP)
             </button>

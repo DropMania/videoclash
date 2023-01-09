@@ -10,6 +10,7 @@ import ModeratorView from './routes/mod/ModeratorView.svelte'
 import ManageModerators from './routes/mod/ManageModerators.svelte'
 import ModeratorInvitePage from './routes/mod/ModeratorInvitePage.svelte'
 import Info from './routes/Info.svelte'
+import WIP from './routes/WIP.svelte'
 import CreateTierList from './routes/t/CreateTierList.svelte'
 import TierList from './routes/t/TierList.svelte'
 export default {
@@ -20,11 +21,12 @@ export default {
     '/b/create': CreateB,
     '/tos': TOS,
     '/b/game/:id': GameB,
-    '/mod/clash/:id':ModeratorView,
-    '/mod/manage/:option':ManageModerators,
-    '/mod/invite/:token':ModeratorInvitePage,
-    '/info/':Info,
+    '/mod/clash/:id': ModeratorView,
+    '/mod/manage/:option': ManageModerators,
+    '/mod/invite/:token': ModeratorInvitePage,
+    '/info/': Info,
     '/t/create': CreateTierList,
     '/t/list/:id': TierList,
+    '/wip': WIP,
     '*': _404
 }
