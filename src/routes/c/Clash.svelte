@@ -71,10 +71,13 @@
                             (submission) => submission.id !== payload.old.id
                         )
                     }
-                    if(payload.eventType === 'UPDATE'){
-                        let submission = submissions.find((element)=>{  return element.id === payload.old.id;  })
-                            submission.approval = payload.new.approval;
-                        submissions = submissions /* stupid but works to refresh the store :DDD */
+                    if (payload.eventType === 'UPDATE') {
+                        let submission = submissions.find((element) => {
+                            return element.id === payload.old.id
+                        })
+                        submission.approval = payload.new.approval
+                        submissions =
+                            submissions /* stupid but works to refresh the store :DDD */
                     }
                 })
                 .subscribe()
@@ -172,6 +175,25 @@
                     channel,
                     tags['display-name'],
                     message.split(' ')[1]
+                )
+            }
+        }
+        if (
+            message.startsWith('!clashlink') &&
+            gameState.video1 &&
+            gameState.video2
+        ) {
+            let number = message.split(' ')[1]
+            if (number === '1') {
+                client.say(
+                    channel,
+                    `Here is the link for Video 1: https://www.youtube.com/watch?v=${gameState.video1.youtubeId}`
+                )
+            }
+            if (number === '2') {
+                client.say(
+                    channel,
+                    `Here is the link for Video 2: https://www.youtube.com/watch?v=${gameState.video2.youtubeId}`
                 )
             }
         }
@@ -331,8 +353,10 @@
         )
     }
 
-    function copyLinkToClipboard(){
-        navigator.clipboard.writeText(`${location.origin}/#/mod/clash/${clashData.id}`);
+    function copyLinkToClipboard() {
+        navigator.clipboard.writeText(
+            `${location.origin}/#/mod/clash/${clashData.id}`
+        )
     }
 </script>
 
@@ -360,28 +384,29 @@
     </h1>
 
     {#if gameState.state == stateEnums.NOT_STARTED}
-    <div class="d-flex  gap-5">
-        <button
-            class="btn btn-primary my-3"
-            on:click={() => (editWindow = true)}
-            >Edit Clash <svg
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-pencil-square"
-                viewBox="0 0 16 16"
+        <div class="d-flex  gap-5">
+            <button
+                class="btn btn-primary my-3"
+                on:click={() => (editWindow = true)}
+                >Edit Clash <svg
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-pencil-square"
+                    viewBox="0 0 16 16"
+                >
+                    <path
+                        d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"
+                    />
+                    <path
+                        fill-rule="evenodd"
+                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
+                    />
+                </svg></button
             >
-                <path
-                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"
-                />
-                <path
-                    fill-rule="evenodd"
-                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"
-                />
-            </svg></button>
             <button class="btn btn-primary my-3" on:click={copyLinkToClipboard}>
                 Mod-Link
-                <span class="fa fa-eye-slash"/> 
+                <span class="fa fa-eye-slash" />
             </button>
         </div>
         <Submissions
@@ -408,9 +433,5 @@
     <Edit bind:open={editWindow} {clashData} {loadClash} />
 {/if}
 
-
 <style>
-
-
-
 </style>
