@@ -13,6 +13,7 @@ import Info from './routes/Info.svelte'
 import WIP from './routes/WIP.svelte'
 import CreateTierList from './routes/t/CreateTierList.svelte'
 import TierList from './routes/t/TierList.svelte'
+import Profile from './routes/u/Profile.svelte'
 export default {
     '/': Home,
     '/c/create': Create,
@@ -28,5 +29,7 @@ export default {
     '/t/create': CreateTierList,
     '/t/list/:id': TierList,
     '/wip': WIP,
+    '/u/profile/:userid': Profile,
     '*': _404
+    
 }

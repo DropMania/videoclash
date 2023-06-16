@@ -6,7 +6,7 @@
 <div class="d-flex flex-row justify-content-between w-100">
     <div class="d-flex flex-column">
         <a
-            href="https://fontawesome.com/v4/icon/github"
+            href="https://github.com/DropMania/videoclash"
             target="_blank"
             title="Checkout GitHub"
         >
