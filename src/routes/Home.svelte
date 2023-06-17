@@ -20,7 +20,8 @@
             iconType: 'fontawesome',
             disable: false
         },{
-            path: '/#/wip',
+            // path: '/#/wip',
+            path: '/#/t/create',
             name: 'Tier-List (WIP)',
             icon: 'fa fa-list-ol',
             iconType: 'fontawesome',

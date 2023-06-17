@@ -3,6 +3,7 @@
     export let video_data = {};
     export let rank={}
     export let rank_index;
+    export let bHovering;
     
     function handleDragStart(e){
 
@@ -28,7 +29,15 @@
     function handleTouchEnd(e){
         console.log('touceEnd',video_data.video_title);
 
-    }    
+    }  
+/*     function handleDragEnter(e){
+        e.preventDefault();
+        bHovering = true;
+    }
+    function handleDragLeave(e){
+        e.preventDefault();
+        bHovering = false;
+    }   */
 </script>
 
 <div class="card border border-secondary m-1 user-select-none" 
@@ -37,7 +46,7 @@
     on:dragend={handleDragEnd}
     on:touchstart={handleTouchStart}
     on:touchmove={handleTouchMove}
-    on:touchend={handleTouchEnd}
+    on:touchend={handleTouchEnd}  
     style="cursor: move; width:250px; height:160px"
 >
     <!-- <h5 class="card-header">{video_data.video_title}</h5> -->

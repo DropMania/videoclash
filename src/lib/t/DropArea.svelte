@@ -61,7 +61,7 @@
             }}
         >
             {#each rank_data.items as item}
-                <VideoCard video_data={item} rank={rank_data} rank_index={rank_index}></VideoCard>
+                <VideoCard video_data={item} rank={rank_data} rank_index={rank_index} bind:bHovering></VideoCard>
             {/each}
 
         </div>

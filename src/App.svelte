@@ -3,7 +3,7 @@
     import routes from './routes';
     import supabase from './supabase';
     import { user, twitch_token } from './store';
-    import { getHoursDiff } from './utils.js';
+    import { getHoursDiff, openSuggestionDialog } from './utils.js';
     import { push } from "svelte-spa-router";
 
     async function signInWithTwitch() {
@@ -70,6 +70,10 @@
             $user = null
         }
     })
+
+    async function _openSuggestionBox(){
+        openSuggestionDialog();
+    }
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky">
@@ -130,6 +134,11 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/#/info">Info</a></li>
+                        <li>
+                            <button class="dropdown-item" on:click={_openSuggestionBox}>
+                                Suggestions
+                            </button> 
+                        </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <button class="dropdown-item" on:click={signout}>Logout</button>

@@ -3,6 +3,7 @@ import moment from 'moment'
 import { twitch_token } from './store'
 import ConfirmDialog from './lib/util/ConfirmDialog.svelte'
 import AlertDialog from './lib/util/AlertDialog.svelte'
+import SuggestionBox from './lib/util/SuggestionBox.svelte'
 export function shortid(len = 11) {
     let result = ''
     let chars =
@@ -135,6 +136,20 @@ export async function alertDialog(parent=document.getElementById('app'), titleTe
             onOkay: ()=>{
                 el.$destroy()
                 okayCallback()
+            }
+        }
+    });
+}
+
+export async function openSuggestionDialog(){
+    let el = new SuggestionBox({
+        target: document.getElementById('app'),
+        props:{
+            onCancel: ()=>{
+                el.$destroy()
+            },
+            onOkay: ()=>{
+                el.$destroy()
             }
         }
     });

@@ -13,7 +13,7 @@ Create a Clash to let your community submit Videos and let them vote wich is the
         -   give a reason or some funny comment to your submission
     -   set starting/end point of video (theoretically possible with YT url-parameter, but only for YT links)
 -   post link of clashing videos
-    -   !clashlink 1/2 to get the link of either submits currently battleing
+    -   !clashlink 1/2 to get the link of either submits currently battleing  :white_check_mark:
     -   button beneath video-previews with the same function => post Link of video
         -   easy help for streamer
 -   config allowable submit urls

@@ -1,9 +1,10 @@
 <script>
-    import DropArea from "../../lib/t/DropArea.svelte";
+    import { push } from "svelte-spa-router";
+import DropArea from "../../lib/t/DropArea.svelte";
     import { shortid } from "../../utils.js";
     export let params = {}
 
-    let Ranks = [
+    var Ranks = [
         {
             name:'S',
             items:[],
@@ -21,7 +22,7 @@
             items:[],
             type:'ranking',
             id:'0i35iir350kjj5'
-        },
+        }/* ,
         {
             name:'C',
             items:[],
@@ -51,13 +52,13 @@
             items:[],
             type:'ranking',
             id:'j6534j653koi76'
-        },
+        }*/,
         {
             name:'',
             items:[],
             type:'openvideos',
             id:'erh45hj5u436255'
-        }
+        } 
     ];
 
 
@@ -66,7 +67,9 @@
         Ranks[Ranks.length-1].items = [...Ranks[Ranks.length-1].items, {id:shortid(),video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:shortid(), img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'}]
     }
 
-
+    async function _test(){
+        debugger
+    }
 </script>
 
 <h2>The Tier-List topic - {params.id}</h2>
@@ -81,13 +84,34 @@
 
 <button
     on:click={()=>{
-
-        Ranks[8].items = [...Ranks[8].items, {id:shortid(),video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:shortid(), img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'}]
+        let i = Ranks.length -1 ;
+        Ranks[i].items = [...Ranks[i].items, {id:shortid(),video_title:'Ken Ashcorp - Touch Fluffy Tail',submitter_name:shortid(), img:'https://i.ytimg.com/vi/4nyHPIcbn88/default.jpg'}]
         
         console.log(Ranks);
         
     }}
 >test</button>
+<button on:click={
+    ()=>{
+        let last = Ranks.length -1 ;
+        let oLast = Ranks.pop();
+
+        Ranks.push({
+            name: shortid(),
+            items:[],
+            type:'ranking',
+            id: shortid()
+        })
+
+        Ranks.push(oLast);
+
+        Ranks = Ranks
+        console.log(Ranks);
+        
+    }
+}>
+    add rank
+</button>
 
 <style>
 
